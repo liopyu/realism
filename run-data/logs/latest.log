@@ -1,0 +1,32 @@
+[17Aug2024 15:25:41.078] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 1.19, --assetsDir, C:\Users\subli\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 43.4.2, --fml.mcVersion, 1.19.2, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20220805.130853, --mod, realism, --all, --output, C:\Users\subli\Desktop\Realism\src\generated\resources, --existing, C:\Users\subli\Desktop\Realism\src\main\resources, --mixin.config, realism.mixins.json]
+[17Aug2024 15:25:41.081] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.8 by Eclipse Adoptium; OS Windows 11 arch amd64 version 10.0
+[17Aug2024 15:25:41.198] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/subli/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23126!/ Service=ModLauncher Env=CLIENT
+[17Aug2024 15:25:41.442] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\subli\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.19.2-43.4.2\7d1c4d7caa004bf0bdb2554c6ff24390c787d5d1\javafmllanguage-1.19.2-43.4.2.jar is missing mods.toml file
+[17Aug2024 15:25:41.444] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\subli\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.19.2-43.4.2\e8268e0754f4ad34279d3d566b751b16b55cabcd\lowcodelanguage-1.19.2-43.4.2.jar is missing mods.toml file
+[17Aug2024 15:25:41.446] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\subli\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.19.2-43.4.2\1c5e3f807a565d8e9d5930f65ed1e01c39ac405e\mclanguage-1.19.2-43.4.2.jar is missing mods.toml file
+[17Aug2024 15:25:41.448] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\subli\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.19.2-43.4.2\d2d29a451a0efe3114612cd3e7bc30bb0a85143f\fmlcore-1.19.2-43.4.2.jar is missing mods.toml file
+[17Aug2024 15:25:41.504] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[17Aug2024 15:25:42.376] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\subli\.gradle\caches\forge_gradle\assets, --assetIndex, 1.19, --mod, realism, --all, --output, C:\Users\subli\Desktop\Realism\src\generated\resources, --existing, C:\Users\subli\Desktop\Realism\src\main\resources]
+[17Aug2024 15:25:42.425] [main/WARN] [mixin/]: Reference map 'Realism.refmap.json' for realism.mixins.json could not be read. If this is a development environment you can ignore this message
+[17Aug2024 15:25:42.534] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [realism]
+[17Aug2024 15:25:44.432] [main/INFO] [net.minecraft.util.datafix.DataFixers/]: Building unoptimized datafixer
+[17Aug2024 15:25:45.805] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 43.4.2, for MC 1.19.2 with MCP 20220805.130853
+[17Aug2024 15:25:45.809] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v43.4.2 Initialized
+[17Aug2024 15:25:45.959] [modloading-worker-0/ERROR] [net.minecraftforge.fml.javafmlmod.FMLModContainer/LOADING]: Failed to create mod instance. ModID: realism, class net.liopyu.realism.Realism
+java.lang.NullPointerException: Cannot invoke "net.minecraft.client.Minecraft.reloadResourcePacks()" because the return value of "net.minecraft.client.Minecraft.getInstance()" is null
+	at net.liopyu.realism.Realism.<init>(Realism.java:33) ~[%23193!/:?]
+	at jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77) ~[?:?]
+	at jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) ~[?:?]
+	at java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499) ~[?:?]
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:480) ~[?:?]
+	at net.minecraftforge.fml.javafmlmod.FMLModContainer.constructMod(FMLModContainer.java:70) ~[javafmllanguage-1.19.2-43.4.2.jar%23189!/:?]
+	at net.minecraftforge.fml.ModContainer.lambda$buildTransitionHandler$4(ModContainer.java:122) ~[fmlcore-1.19.2-43.4.2.jar%23192!/:?]
+	at java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804) [?:?]
+	at java.util.concurrent.CompletableFuture$AsyncRun.exec(CompletableFuture.java:1796) [?:?]
+	at java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373) [?:?]
+	at java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182) [?:?]
+	at java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655) [?:?]
+	at java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622) [?:?]
+	at java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165) [?:?]
+[17Aug2024 15:25:46.060] [main/FATAL] [net.minecraftforge.fml.ModLoader/LOADING]: Failed to complete lifecycle event CONSTRUCT, 1 errors found
