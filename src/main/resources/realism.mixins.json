@@ -1,10 +1,12 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.liopyu.realism.realism.mixin",
+  "package": "net.liopyu.realism.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "Realism.refmap.json",
   "mixins": [
+    "MixinNoiseBasedChunkGenerator",
+    "MixinNoiseChunk"
   ],
   "client": [
   ],

@@ -32,6 +32,10 @@ public class Realism {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         BLOCKS.register(bus);
         ITEMS.register(bus);
+        RegistryUtils.createBlock("deep_stone", BlockBehaviour.Properties.of(Material.STONE));
+        RegistryUtils.createBlock("deep_cobblestone", BlockBehaviour.Properties.of(Material.STONE));
+        RegistryUtils.createBlock("boulder_stone", BlockBehaviour.Properties.of(Material.STONE));
+        RegistryUtils.createBlock("boulder_cobblestone", BlockBehaviour.Properties.of(Material.STONE));
         RegistryUtils.createBlock("loose_cobblestone", BlockBehaviour.Properties.of(Material.STONE));
         RegistryUtils.createBlock("cracked_cobblestone", BlockBehaviour.Properties.of(Material.STONE));
         RegistryUtils.createBlock("crumbling_cobblestone", BlockBehaviour.Properties.of(Material.STONE));

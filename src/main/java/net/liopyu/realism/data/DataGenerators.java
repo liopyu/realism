@@ -12,7 +12,7 @@ public class DataGenerators {
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
-        /*DataGenerator generator = event.getGenerator();
+        DataGenerator generator = event.getGenerator();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
         RealismBlockTagsProvider blockTagsProvider = new RealismBlockTagsProvider(generator, existingFileHelper);
@@ -23,7 +23,7 @@ public class DataGenerators {
         generator.addProvider(event.includeServer(), new RealismItemModelProvider(generator, existingFileHelper));
         generator.addProvider(event.includeServer(), new RealismLootTableProvider(generator));
         generator.addProvider(event.includeServer(), new RealismRecipeProvider(generator));
-        generator.addProvider(event.includeServer(), new RealismLangProvider(generator, "en_us"));*/
+        generator.addProvider(event.includeServer(), new RealismLangProvider(generator, "en_us"));
     }
 
 }

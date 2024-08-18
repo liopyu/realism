@@ -60,7 +60,9 @@ public class RealismHelperClass {
             errorMessagesLogged.add(errorMessage);
         }
     }
-
+    public static Block getRealismBlock(String name) {
+        return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(Realism.MODID,name));
+    }
     public static void logWarningMessageOnce(String errorMessage) {
         if (!warningMessagesLogged.contains(errorMessage)) {
             Realism.LOGGER.warn(errorMessage);
