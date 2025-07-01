@@ -10,6 +10,7 @@ import java.util.*;
 
 
 public class JsonFileGenerator {
+    private static final List<String> BASEITEMS = new ArrayList<>();
     public static List<String> BLOCK_NAMES = new ArrayList<>();
     public static Map<String, List<String>> TAGSFORBLOCK = new HashMap<>();
     public static List<String> BASEBLOCKS = new ArrayList<>();
@@ -28,7 +29,8 @@ public class JsonFileGenerator {
         TAGSFORBLOCK.put("deep_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_diamond_tool",
-                "minecraft:base_stone_overworld"
+                "minecraft:base_stone_overworld",
+                "realism:deep_ore_replaceables"
         ));
         TAGSFORBLOCK.put("deep_cobblestone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -37,7 +39,8 @@ public class JsonFileGenerator {
         TAGSFORBLOCK.put("boulder_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_iron_tool",
-                "minecraft:base_stone_overworld"
+                "minecraft:base_stone_overworld",
+                "realism:boulder_ore_replaceables"
         ));
         TAGSFORBLOCK.put("boulder_cobblestone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -66,14 +69,16 @@ public class JsonFileGenerator {
 
         TAGSFORBLOCK.put("deep_diamond_ore", List.of(
                 "minecraft:mineable/pickaxe",
-                "minecraft:needs_diamond_tool",
-                "realism:deep_ore_replaceables"
+                "minecraft:needs_diamond_tool"
         ));
         TAGSFORBLOCK.put("boulder_diamond_ore", List.of(
                 "minecraft:mineable/pickaxe",
-                "minecraft:needs_iron_tool",
-                "realism:boulder_ore_replaceables"
+                "minecraft:needs_iron_tool"
         ));
+
+        BASEITEMS.add("stone_pebble");
+        BASEITEMS.add("deep_stone_pebble");
+        BASEITEMS.add("boulder_stone_pebble");
     }
 
     public static void main(String[] args) {
@@ -84,8 +89,12 @@ public class JsonFileGenerator {
     }
 
     public static void generateAllJson() {
+        BASEITEMS.forEach(name -> {
+            generateSimpleItemModelJson(name, "realism:item/name");
+        });
         BASEBLOCKS.forEach(name -> {
             generateBlockJson(name);
+            generateOreLootTableWithPebbles(name, "minecraft:blocks/diamond_ore", BASEITEMS, 4, 6);
         });
         BLOCK_NAMES.forEach((name) -> {
             generateBlockJson(name);
@@ -106,6 +115,84 @@ public class JsonFileGenerator {
         generateLangFile();
         generateDefaultRecipes();
         System.out.println("JSON generation complete.");
+    }
+
+    public static void generateOreLootTableWithPebbles(
+            String blockName,
+            String vanillaLootTable,
+            List<String> pebbleItems,
+            int minPebbles,
+            int maxPebbles
+    ) {
+        String path = "src/main/resources/data/realism/loot_table/blocks/";
+
+        StringBuilder pebbleEntries = new StringBuilder();
+        for (int i = 0; i < pebbleItems.size(); i++) {
+            String pebble = pebbleItems.get(i);
+            pebbleEntries.append(
+                    "        {\n" +
+                            "          \"type\": \"minecraft:item\",\n" +
+                            "          \"name\": \"" + pebble + "\",\n" +
+                            "          \"functions\": [\n" +
+                            "            {\n" +
+                            "              \"function\": \"minecraft:set_count\",\n" +
+                            "              \"count\": { \"min\": " + minPebbles + ", \"max\": " + maxPebbles + " }\n" +
+                            "            },\n" +
+                            "            { \"function\": \"minecraft:explosion_decay\" }\n" +
+                            "          ]\n" +
+                            "        }"
+            );
+            if (i < pebbleItems.size() - 1) pebbleEntries.append(",\n");
+        }
+
+        String content =
+                "{\n" +
+                        "  \"type\": \"minecraft:block\",\n" +
+                        "  \"pools\": [\n" +
+                        "    {\n" +
+                        "      \"rolls\": 1,\n" +
+                        "      \"entries\": [\n" +
+                        "        {\n" +
+                        "          \"type\": \"minecraft:loot_table\",\n" +
+                        "          \"value\": \"" + vanillaLootTable + "\"\n" +
+                        "        }" +
+                        (pebbleItems.isEmpty() ? "" : ",\n" + pebbleEntries) + "\n" +
+                        "      ]\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
+        writeFile(path, blockName + ".json", content);
+    }
+
+    public static void generateSimpleItemModelJson(String itemName, String textureName) {
+        String path = ASSETS_PATH + "models/item/";
+        String content = "{\n" +
+                "  \"parent\": \"minecraft:item/generated\",\n" +
+                "  \"textures\": {\n" +
+                "    \"layer0\": \"" + textureName + "\"\n" +
+                "  }\n" +
+                "}";
+        writeFile(path, itemName + ".json", content);
+    }
+
+    public static void generateOreLootTable(String blockName, String vanillaLootTable) {
+        String path = "src/main/resources/data/realism/loot_table/blocks/";
+        String content =
+                "{\n" +
+                        "  \"type\": \"minecraft:block\",\n" +
+                        "  \"pools\": [\n" +
+                        "    {\n" +
+                        "      \"rolls\": 1,\n" +
+                        "      \"entries\": [\n" +
+                        "        {\n" +
+                        "          \"type\": \"minecraft:loot_table\",\n" +
+                        "          \"value\": \"" + vanillaLootTable + "\"\n" +
+                        "        }\n" +
+                        "      ]\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
+        writeFile(path, blockName + ".json", content);
     }
 
     public static void generateMiningLevelTags(Map<String, List<String>> tagsForBlock) {

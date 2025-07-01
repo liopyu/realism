@@ -3,6 +3,7 @@ package net.liopyu.realism.util;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
@@ -19,6 +20,15 @@ public class RegistryUtils {
             Function<ResourceLocation, Block> blockFactory,
             Function<Block, BlockBehaviour.Properties> propertiesFactory
     ) {
+    }
+
+    public static void registerItemsOnly(
+            DeferredRegister.Items items,
+            List<String> names
+    ) {
+        for (String name : names) {
+            items.register(name, () -> new Item(new Item.Properties().stacksTo(64)));
+        }
     }
 
     public static void registerBaseBlocks(

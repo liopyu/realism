@@ -6,9 +6,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
@@ -56,14 +58,10 @@ public class Realism {
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TABS.register(bus);
-        BLOCK_NAMES.add("deep_stone");
-        BLOCK_NAMES.add("deep_cobblestone");
-        BLOCK_NAMES.add("boulder_stone");
-        BLOCK_NAMES.add("boulder_cobblestone");
-        BLOCK_NAMES.add("loose_cobblestone");
-        BLOCK_NAMES.add("cracked_cobblestone");
-        BLOCK_NAMES.add("crumbling_cobblestone");
-        BLOCK_NAMES.add("broken_cobblestone");
+
+        List<String> itemNames = List.of("stone_pebble", "deep_stone_pebble", "boulder_stone_pebble");
+        RegistryUtils.registerItemsOnly(ITEMS, itemNames);
+
         List<RegistryUtils.BlockEntry> entries = List.of(
                 cobbleEntry("deep_stone", 5F, 10F),
                 cobbleEntry("deep_cobblestone", 4F, 9F),
@@ -77,7 +75,7 @@ public class Realism {
         List<RegistryUtils.BlockEntry> oreEntries = List.of(
                 new RegistryUtils.BlockEntry(
                         "deep_diamond_ore",
-                        rl -> new Block(
+                        rl -> new DropExperienceBlock(UniformInt.of(3, 7),
                                 BlockBehaviour.Properties.of()
                                         .setId(ResourceKey.create(Registries.BLOCK, rl))
                                         .mapColor(MapColor.STONE)
@@ -89,7 +87,7 @@ public class Realism {
                 ),
                 new RegistryUtils.BlockEntry(
                         "boulder_diamond_ore",
-                        rl -> new Block(
+                        rl -> new DropExperienceBlock(UniformInt.of(3, 7),
                                 BlockBehaviour.Properties.of()
                                         .setId(ResourceKey.create(Registries.BLOCK, rl))
                                         .mapColor(MapColor.STONE)
@@ -117,6 +115,9 @@ public class Realism {
                             }
                             for (var entry : oreEntries) {
                                 output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name())).get().value());
+                            }
+                            for (var entry : itemNames) {
+                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry)).get().value());
                             }
                         })
                         .build()
