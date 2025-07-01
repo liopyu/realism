@@ -1,8 +1,0 @@
-{
-  "parent": "block/stairs",
-  "textures": {
-    "bottom": "realism:block/deep_stone",
-    "top": "realism:block/deep_stone",
-    "side": "realism:block/deep_stone"
-  }
-}

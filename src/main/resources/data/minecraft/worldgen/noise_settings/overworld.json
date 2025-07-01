@@ -1,9 +1,5 @@
 {
-	"sea_level": 63,
-	"disable_mob_generation": false,
 	"aquifers_enabled": true,
-	"ore_veins_enabled": true,
-	"legacy_random_source": false,
 	"default_block": {
 		"Name": "minecraft:stone"
 	},
@@ -13,9 +9,11 @@
 			"level": "0"
 		}
 	},
+	"disable_mob_generation": false,
+	"legacy_random_source": false,
 	"noise": {
-		"min_y": -64,
 		"height": 384,
+		"min_y": -64,
 		"size_horizontal": 1,
 		"size_vertical": 2
 	},
@@ -23,109 +21,12 @@
 		"barrier": {
 			"type": "minecraft:noise",
 			"noise": "minecraft:aquifer_barrier",
-			"xz_scale": 1,
+			"xz_scale": 1.0,
 			"y_scale": 0.5
 		},
-		"fluid_level_floodedness": {
-			"type": "minecraft:noise",
-			"noise": "minecraft:aquifer_fluid_level_floodedness",
-			"xz_scale": 1,
-			"y_scale": 0.67
-		},
-		"fluid_level_spread": {
-			"type": "minecraft:noise",
-			"noise": "minecraft:aquifer_fluid_level_spread",
-			"xz_scale": 1,
-			"y_scale": 0.7142857142857143
-		},
-		"lava": {
-			"type": "minecraft:noise",
-			"noise": "minecraft:aquifer_lava",
-			"xz_scale": 1,
-			"y_scale": 1
-		},
-		"temperature": {
-			"type": "minecraft:shifted_noise",
-			"noise": "minecraft:temperature",
-			"xz_scale": 0.25,
-			"y_scale": 0,
-			"shift_x": "minecraft:shift_x",
-			"shift_y": 0,
-			"shift_z": "minecraft:shift_z"
-		},
-		"vegetation": {
-			"type": "minecraft:shifted_noise",
-			"noise": "minecraft:vegetation",
-			"xz_scale": 0.25,
-			"y_scale": 0,
-			"shift_x": "minecraft:shift_x",
-			"shift_y": 0,
-			"shift_z": "minecraft:shift_z"
-		},
 		"continents": "minecraft:overworld/continents",
-		"erosion": "minecraft:overworld/erosion",
 		"depth": "minecraft:overworld/depth",
-		"ridges": "minecraft:overworld/ridges",
-		"initial_density_without_jaggedness": {
-			"type": "minecraft:add",
-			"argument1": 0.1171875,
-			"argument2": {
-				"type": "minecraft:mul",
-				"argument1": {
-					"type": "minecraft:y_clamped_gradient",
-					"from_y": -64,
-					"to_y": -40,
-					"from_value": 0,
-					"to_value": 1
-				},
-				"argument2": {
-					"type": "minecraft:add",
-					"argument1": -0.1171875,
-					"argument2": {
-						"type": "minecraft:add",
-						"argument1": -0.078125,
-						"argument2": {
-							"type": "minecraft:mul",
-							"argument1": {
-								"type": "minecraft:y_clamped_gradient",
-								"from_y": 240,
-								"to_y": 256,
-								"from_value": 1,
-								"to_value": 0
-							},
-							"argument2": {
-								"type": "minecraft:add",
-								"argument1": 0.078125,
-								"argument2": {
-									"type": "minecraft:clamp",
-									"input": {
-										"type": "minecraft:add",
-										"argument1": -0.703125,
-										"argument2": {
-											"type": "minecraft:mul",
-											"argument1": 4,
-											"argument2": {
-												"type": "minecraft:quarter_negative",
-												"argument": {
-													"type": "minecraft:mul",
-													"argument1": "minecraft:overworld/depth",
-													"argument2": {
-														"type": "minecraft:cache_2d",
-														"argument": "minecraft:overworld/factor"
-													}
-												}
-											}
-										}
-									},
-									"min": -64,
-									"max": 64
-								}
-							}
-						}
-					}
-				}
-			}
-		},
+		"erosion": "minecraft:overworld/erosion",
 		"final_density": {
 			"type": "minecraft:min",
 			"argument1": {
@@ -144,10 +45,10 @@
 									"type": "minecraft:mul",
 									"argument1": {
 										"type": "minecraft:y_clamped_gradient",
+										"from_value": 0.0,
 										"from_y": -64,
-										"to_y": -40,
-										"from_value": 0,
-										"to_value": 1
+										"to_value": 1.0,
+										"to_y": -40
 									},
 									"argument2": {
 										"type": "minecraft:add",
@@ -159,10 +60,10 @@
 												"type": "minecraft:mul",
 												"argument1": {
 													"type": "minecraft:y_clamped_gradient",
+													"from_value": 1.0,
 													"from_y": 240,
-													"to_y": 256,
-													"from_value": 1,
-													"to_value": 0
+													"to_value": 0.0,
+													"to_y": 256
 												},
 												"argument2": {
 													"type": "minecraft:add",
@@ -170,14 +71,14 @@
 													"argument2": {
 														"type": "minecraft:range_choice",
 														"input": "minecraft:overworld/sloped_cheese",
-														"min_inclusive": -1000000,
 														"max_exclusive": 1.5625,
+														"min_inclusive": -1000000.0,
 														"when_in_range": {
 															"type": "minecraft:min",
 															"argument1": "minecraft:overworld/sloped_cheese",
 															"argument2": {
 																"type": "minecraft:mul",
-																"argument1": 5,
+																"argument1": 5.0,
 																"argument2": "minecraft:overworld/caves/entrances"
 															}
 														},
@@ -191,14 +92,14 @@
 																		"type": "minecraft:add",
 																		"argument1": {
 																			"type": "minecraft:mul",
-																			"argument1": 4,
+																			"argument1": 4.0,
 																			"argument2": {
 																				"type": "minecraft:square",
 																				"argument": {
 																					"type": "minecraft:noise",
 																					"noise": "minecraft:cave_layer",
-																					"xz_scale": 1,
-																					"y_scale": 8
+																					"xz_scale": 1.0,
+																					"y_scale": 8.0
 																				}
 																			}
 																		},
@@ -212,12 +113,12 @@
 																					"argument2": {
 																						"type": "minecraft:noise",
 																						"noise": "minecraft:cave_cheese",
-																						"xz_scale": 1,
+																						"xz_scale": 1.0,
 																						"y_scale": 0.6666666666666666
 																					}
 																				},
-																				"min": -1,
-																				"max": 1
+																				"max": 1.0,
+																				"min": -1.0
 																			},
 																			"argument2": {
 																				"type": "minecraft:clamp",
@@ -230,8 +131,8 @@
 																						"argument2": "minecraft:overworld/sloped_cheese"
 																					}
 																				},
-																				"min": 0,
-																				"max": 0.5
+																				"max": 0.5,
+																				"min": 0.0
 																			}
 																		}
 																	},
@@ -246,9 +147,9 @@
 															"argument2": {
 																"type": "minecraft:range_choice",
 																"input": "minecraft:overworld/caves/pillars",
-																"min_inclusive": -1000000,
 																"max_exclusive": 0.03,
-																"when_in_range": -1000000,
+																"min_inclusive": -1000000.0,
+																"when_in_range": -1000000.0,
 																"when_out_of_range": "minecraft:overworld/caves/pillars"
 															}
 														}
@@ -265,21 +166,108 @@
 			},
 			"argument2": "minecraft:overworld/caves/noodle"
 		},
-		"vein_toggle": {
-			"type": "minecraft:interpolated",
-			"argument": {
-				"type": "minecraft:range_choice",
-				"input": "minecraft:y",
-				"min_inclusive": -60,
-				"max_exclusive": 51,
-				"when_in_range": {
-					"type": "minecraft:noise",
-					"noise": "minecraft:ore_veininess",
-					"xz_scale": 1.5,
-					"y_scale": 1.5
+		"fluid_level_floodedness": {
+			"type": "minecraft:noise",
+			"noise": "minecraft:aquifer_fluid_level_floodedness",
+			"xz_scale": 1.0,
+			"y_scale": 0.67
+		},
+		"fluid_level_spread": {
+			"type": "minecraft:noise",
+			"noise": "minecraft:aquifer_fluid_level_spread",
+			"xz_scale": 1.0,
+			"y_scale": 0.7142857142857143
+		},
+		"initial_density_without_jaggedness": {
+			"type": "minecraft:add",
+			"argument1": 0.1171875,
+			"argument2": {
+				"type": "minecraft:mul",
+				"argument1": {
+					"type": "minecraft:y_clamped_gradient",
+					"from_value": 0.0,
+					"from_y": -64,
+					"to_value": 1.0,
+					"to_y": -40
 				},
-				"when_out_of_range": 0
+				"argument2": {
+					"type": "minecraft:add",
+					"argument1": -0.1171875,
+					"argument2": {
+						"type": "minecraft:add",
+						"argument1": -0.078125,
+						"argument2": {
+							"type": "minecraft:mul",
+							"argument1": {
+								"type": "minecraft:y_clamped_gradient",
+								"from_value": 1.0,
+								"from_y": 240,
+								"to_value": 0.0,
+								"to_y": 256
+							},
+							"argument2": {
+								"type": "minecraft:add",
+								"argument1": 0.078125,
+								"argument2": {
+									"type": "minecraft:clamp",
+									"input": {
+										"type": "minecraft:add",
+										"argument1": -0.703125,
+										"argument2": {
+											"type": "minecraft:mul",
+											"argument1": 4.0,
+											"argument2": {
+												"type": "minecraft:quarter_negative",
+												"argument": {
+													"type": "minecraft:mul",
+													"argument1": "minecraft:overworld/depth",
+													"argument2": {
+														"type": "minecraft:cache_2d",
+														"argument": "minecraft:overworld/factor"
+													}
+												}
+											}
+										}
+									},
+									"max": 64.0,
+									"min": -64.0
+								}
+							}
+						}
+					}
+				}
 			}
+		},
+		"lava": {
+			"type": "minecraft:noise",
+			"noise": "minecraft:aquifer_lava",
+			"xz_scale": 1.0,
+			"y_scale": 1.0
+		},
+		"ridges": "minecraft:overworld/ridges",
+		"temperature": {
+			"type": "minecraft:shifted_noise",
+			"noise": "minecraft:temperature",
+			"shift_x": "minecraft:shift_x",
+			"shift_y": 0.0,
+			"shift_z": "minecraft:shift_z",
+			"xz_scale": 0.25,
+			"y_scale": 0.0
+		},
+		"vegetation": {
+			"type": "minecraft:shifted_noise",
+			"noise": "minecraft:vegetation",
+			"shift_x": "minecraft:shift_x",
+			"shift_y": 0.0,
+			"shift_z": "minecraft:shift_z",
+			"xz_scale": 0.25,
+			"y_scale": 0.0
+		},
+		"vein_gap": {
+			"type": "minecraft:noise",
+			"noise": "minecraft:ore_gap",
+			"xz_scale": 1.0,
+			"y_scale": 1.0
 		},
 		"vein_ridged": {
 			"type": "minecraft:add",
@@ -293,15 +281,15 @@
 						"argument": {
 							"type": "minecraft:range_choice",
 							"input": "minecraft:y",
-							"min_inclusive": -60,
-							"max_exclusive": 51,
+							"max_exclusive": 51.0,
+							"min_inclusive": -60.0,
 							"when_in_range": {
 								"type": "minecraft:noise",
 								"noise": "minecraft:ore_vein_a",
-								"xz_scale": 4,
-								"y_scale": 4
+								"xz_scale": 4.0,
+								"y_scale": 4.0
 							},
-							"when_out_of_range": 0
+							"when_out_of_range": 0.0
 						}
 					}
 				},
@@ -312,75 +300,87 @@
 						"argument": {
 							"type": "minecraft:range_choice",
 							"input": "minecraft:y",
-							"min_inclusive": -60,
-							"max_exclusive": 51,
+							"max_exclusive": 51.0,
+							"min_inclusive": -60.0,
 							"when_in_range": {
 								"type": "minecraft:noise",
 								"noise": "minecraft:ore_vein_b",
-								"xz_scale": 4,
-								"y_scale": 4
+								"xz_scale": 4.0,
+								"y_scale": 4.0
 							},
-							"when_out_of_range": 0
+							"when_out_of_range": 0.0
 						}
 					}
 				}
 			}
 		},
-		"vein_gap": {
-			"type": "minecraft:noise",
-			"noise": "minecraft:ore_gap",
-			"xz_scale": 1,
-			"y_scale": 1
+		"vein_toggle": {
+			"type": "minecraft:interpolated",
+			"argument": {
+				"type": "minecraft:range_choice",
+				"input": "minecraft:y",
+				"max_exclusive": 51.0,
+				"min_inclusive": -60.0,
+				"when_in_range": {
+					"type": "minecraft:noise",
+					"noise": "minecraft:ore_veininess",
+					"xz_scale": 1.5,
+					"y_scale": 1.5
+				},
+				"when_out_of_range": 0.0
+			}
 		}
 	},
+	"ore_veins_enabled": true,
+	"sea_level": 63,
 	"spawn_target": [
 		{
-			"temperature": [
-				-1,
-				1
+			"continentalness": [
+				-0.11,
+				1.0
+			],
+			"depth": 0.0,
+			"erosion": [
+				-1.0,
+				1.0
 			],
 			"humidity": [
-				-1,
-				1
+				-1.0,
+				1.0
 			],
-			"continentalness": [
-				-0.10999999940395355,
-				1
-			],
-			"erosion": [
-				-1,
-				1
+			"offset": 0.0,
+			"temperature": [
+				-1.0,
+				1.0
 			],
 			"weirdness": [
-				-1,
-				-0.1599999964237213
-			],
-			"depth": 0,
-			"offset": 0
+				-1.0,
+				-0.16
+			]
 		},
 		{
-			"temperature": [
-				-1,
-				1
+			"continentalness": [
+				-0.11,
+				1.0
+			],
+			"depth": 0.0,
+			"erosion": [
+				-1.0,
+				1.0
 			],
 			"humidity": [
-				-1,
-				1
+				-1.0,
+				1.0
 			],
-			"continentalness": [
-				-0.10999999940395355,
-				1
-			],
-			"erosion": [
-				-1,
-				1
+			"offset": 0.0,
+			"temperature": [
+				-1.0,
+				1.0
 			],
 			"weirdness": [
-				0.1599999964237213,
-				1
-			],
-			"depth": 0,
-			"offset": 0
+				0.16,
+				1.0
+			]
 		}
 	],
 	"surface_rule": {
@@ -390,12 +390,12 @@
 				"type": "minecraft:condition",
 				"if_true": {
 					"type": "minecraft:vertical_gradient",
+					"false_at_and_above": {
+						"above_bottom": 5
+					},
 					"random_name": "minecraft:bedrock_floor",
 					"true_at_and_below": {
 						"above_bottom": 0
-					},
-					"false_at_and_above": {
-						"above_bottom": 5
 					}
 				},
 				"then_run": {
@@ -417,10 +417,10 @@
 							"type": "minecraft:condition",
 							"if_true": {
 								"type": "minecraft:stone_depth",
-								"offset": 0,
-								"surface_type": "floor",
 								"add_surface_depth": false,
-								"secondary_depth_range": 0
+								"offset": 0,
+								"secondary_depth_range": 0,
+								"surface_type": "floor"
 							},
 							"then_run": {
 								"type": "minecraft:sequence",
@@ -437,11 +437,11 @@
 											"type": "minecraft:condition",
 											"if_true": {
 												"type": "minecraft:y_above",
+												"add_stone_depth": false,
 												"anchor": {
 													"absolute": 97
 												},
-												"surface_depth_multiplier": 2,
-												"add_stone_depth": false
+												"surface_depth_multiplier": 2
 											},
 											"then_run": {
 												"type": "minecraft:sequence",
@@ -450,9 +450,9 @@
 														"type": "minecraft:condition",
 														"if_true": {
 															"type": "minecraft:noise_threshold",
-															"noise": "minecraft:surface",
+															"max_threshold": -0.5454,
 															"min_threshold": -0.909,
-															"max_threshold": -0.5454
+															"noise": "minecraft:surface"
 														},
 														"then_run": {
 															"type": "minecraft:block",
@@ -465,9 +465,9 @@
 														"type": "minecraft:condition",
 														"if_true": {
 															"type": "minecraft:noise_threshold",
-															"noise": "minecraft:surface",
+															"max_threshold": 0.1818,
 															"min_threshold": -0.1818,
-															"max_threshold": 0.1818
+															"noise": "minecraft:surface"
 														},
 														"then_run": {
 															"type": "minecraft:block",
@@ -480,9 +480,9 @@
 														"type": "minecraft:condition",
 														"if_true": {
 															"type": "minecraft:noise_threshold",
-															"noise": "minecraft:surface",
+															"max_threshold": 0.909,
 															"min_threshold": 0.5454,
-															"max_threshold": 0.909
+															"noise": "minecraft:surface"
 														},
 														"then_run": {
 															"type": "minecraft:block",
@@ -498,9 +498,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -536,11 +536,11 @@
 											"type": "minecraft:condition",
 											"if_true": {
 												"type": "minecraft:y_above",
+												"add_stone_depth": false,
 												"anchor": {
 													"absolute": 62
 												},
-												"surface_depth_multiplier": 0,
-												"add_stone_depth": false
+												"surface_depth_multiplier": 0
 											},
 											"then_run": {
 												"type": "minecraft:condition",
@@ -548,20 +548,20 @@
 													"type": "minecraft:not",
 													"invert": {
 														"type": "minecraft:y_above",
+														"add_stone_depth": false,
 														"anchor": {
 															"absolute": 63
 														},
-														"surface_depth_multiplier": 0,
-														"add_stone_depth": false
+														"surface_depth_multiplier": 0
 													}
 												},
 												"then_run": {
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:noise_threshold",
-														"noise": "minecraft:surface_swamp",
-														"min_threshold": 0,
-														"max_threshold": 1.7976931348623157e+308
+														"max_threshold": 1.7976931348623157E308,
+														"min_threshold": 0.0,
+														"noise": "minecraft:surface_swamp"
 													},
 													"then_run": {
 														"type": "minecraft:block",
@@ -588,11 +588,11 @@
 											"type": "minecraft:condition",
 											"if_true": {
 												"type": "minecraft:y_above",
+												"add_stone_depth": false,
 												"anchor": {
 													"absolute": 60
 												},
-												"surface_depth_multiplier": 0,
-												"add_stone_depth": false
+												"surface_depth_multiplier": 0
 											},
 											"then_run": {
 												"type": "minecraft:condition",
@@ -600,20 +600,20 @@
 													"type": "minecraft:not",
 													"invert": {
 														"type": "minecraft:y_above",
+														"add_stone_depth": false,
 														"anchor": {
 															"absolute": 63
 														},
-														"surface_depth_multiplier": 0,
-														"add_stone_depth": false
+														"surface_depth_multiplier": 0
 													}
 												},
 												"then_run": {
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:noise_threshold",
-														"noise": "minecraft:surface_swamp",
-														"min_threshold": 0,
-														"max_threshold": 1.7976931348623157e+308
+														"max_threshold": 1.7976931348623157E308,
+														"min_threshold": 0.0,
+														"noise": "minecraft:surface_swamp"
 													},
 													"then_run": {
 														"type": "minecraft:block",
@@ -648,10 +648,10 @@
 										"type": "minecraft:condition",
 										"if_true": {
 											"type": "minecraft:stone_depth",
-											"offset": 0,
-											"surface_type": "floor",
 											"add_surface_depth": false,
-											"secondary_depth_range": 0
+											"offset": 0,
+											"secondary_depth_range": 0,
+											"surface_type": "floor"
 										},
 										"then_run": {
 											"type": "minecraft:sequence",
@@ -660,11 +660,11 @@
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:y_above",
+														"add_stone_depth": false,
 														"anchor": {
 															"absolute": 256
 														},
-														"surface_depth_multiplier": 0,
-														"add_stone_depth": false
+														"surface_depth_multiplier": 0
 													},
 													"then_run": {
 														"type": "minecraft:block",
@@ -677,11 +677,11 @@
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:y_above",
+														"add_stone_depth": true,
 														"anchor": {
 															"absolute": 74
 														},
-														"surface_depth_multiplier": 1,
-														"add_stone_depth": true
+														"surface_depth_multiplier": 1
 													},
 													"then_run": {
 														"type": "minecraft:sequence",
@@ -690,9 +690,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": -0.5454,
 																	"min_threshold": -0.909,
-																	"max_threshold": -0.5454
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -705,9 +705,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 0.1818,
 																	"min_threshold": -0.1818,
-																	"max_threshold": 0.1818
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -720,9 +720,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 0.909,
 																	"min_threshold": 0.5454,
-																	"max_threshold": 0.909
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -741,9 +741,9 @@
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:water",
+														"add_stone_depth": false,
 														"offset": -1,
-														"surface_depth_multiplier": 0,
-														"add_stone_depth": false
+														"surface_depth_multiplier": 0
 													},
 													"then_run": {
 														"type": "minecraft:sequence",
@@ -752,10 +752,10 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:stone_depth",
-																	"offset": 0,
-																	"surface_type": "ceiling",
 																	"add_surface_depth": false,
-																	"secondary_depth_range": 0
+																	"offset": 0,
+																	"secondary_depth_range": 0,
+																	"surface_type": "ceiling"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -792,9 +792,9 @@
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:water",
+														"add_stone_depth": true,
 														"offset": -6,
-														"surface_depth_multiplier": -1,
-														"add_stone_depth": true
+														"surface_depth_multiplier": -1
 													},
 													"then_run": {
 														"type": "minecraft:block",
@@ -810,10 +810,10 @@
 															"type": "minecraft:condition",
 															"if_true": {
 																"type": "minecraft:stone_depth",
-																"offset": 0,
-																"surface_type": "ceiling",
 																"add_surface_depth": false,
-																"secondary_depth_range": 0
+																"offset": 0,
+																"secondary_depth_range": 0,
+																"surface_type": "ceiling"
 															},
 															"then_run": {
 																"type": "minecraft:block",
@@ -837,11 +837,11 @@
 										"type": "minecraft:condition",
 										"if_true": {
 											"type": "minecraft:y_above",
+											"add_stone_depth": true,
 											"anchor": {
 												"absolute": 63
 											},
-											"surface_depth_multiplier": -1,
-											"add_stone_depth": true
+											"surface_depth_multiplier": -1
 										},
 										"then_run": {
 											"type": "minecraft:sequence",
@@ -850,11 +850,11 @@
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:y_above",
+														"add_stone_depth": false,
 														"anchor": {
 															"absolute": 63
 														},
-														"surface_depth_multiplier": 0,
-														"add_stone_depth": false
+														"surface_depth_multiplier": 0
 													},
 													"then_run": {
 														"type": "minecraft:condition",
@@ -862,11 +862,11 @@
 															"type": "minecraft:not",
 															"invert": {
 																"type": "minecraft:y_above",
+																"add_stone_depth": true,
 																"anchor": {
 																	"absolute": 74
 																},
-																"surface_depth_multiplier": 1,
-																"add_stone_depth": true
+																"surface_depth_multiplier": 1
 															}
 														},
 														"then_run": {
@@ -887,18 +887,18 @@
 										"type": "minecraft:condition",
 										"if_true": {
 											"type": "minecraft:stone_depth",
-											"offset": 0,
-											"surface_type": "floor",
 											"add_surface_depth": true,
-											"secondary_depth_range": 0
+											"offset": 0,
+											"secondary_depth_range": 0,
+											"surface_type": "floor"
 										},
 										"then_run": {
 											"type": "minecraft:condition",
 											"if_true": {
 												"type": "minecraft:water",
+												"add_stone_depth": true,
 												"offset": -6,
-												"surface_depth_multiplier": -1,
-												"add_stone_depth": true
+												"surface_depth_multiplier": -1
 											},
 											"then_run": {
 												"type": "minecraft:block",
@@ -915,18 +915,18 @@
 							"type": "minecraft:condition",
 							"if_true": {
 								"type": "minecraft:stone_depth",
-								"offset": 0,
-								"surface_type": "floor",
 								"add_surface_depth": false,
-								"secondary_depth_range": 0
+								"offset": 0,
+								"secondary_depth_range": 0,
+								"surface_type": "floor"
 							},
 							"then_run": {
 								"type": "minecraft:condition",
 								"if_true": {
 									"type": "minecraft:water",
+									"add_stone_depth": false,
 									"offset": -1,
-									"surface_depth_multiplier": 0,
-									"add_stone_depth": false
+									"surface_depth_multiplier": 0
 								},
 								"then_run": {
 									"type": "minecraft:sequence",
@@ -952,9 +952,9 @@
 															"type": "minecraft:condition",
 															"if_true": {
 																"type": "minecraft:water",
+																"add_stone_depth": false,
 																"offset": 0,
-																"surface_depth_multiplier": 0,
-																"add_stone_depth": false
+																"surface_depth_multiplier": 0
 															},
 															"then_run": {
 																"type": "minecraft:block",
@@ -1018,9 +1018,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:packed_ice",
-																	"min_threshold": 0,
-																	"max_threshold": 0.2
+																	"max_threshold": 0.2,
+																	"min_threshold": 0.0,
+																	"noise": "minecraft:packed_ice"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1033,9 +1033,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:ice",
-																	"min_threshold": 0,
-																	"max_threshold": 0.025
+																	"max_threshold": 0.025,
+																	"min_threshold": 0.0,
+																	"noise": "minecraft:ice"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1048,9 +1048,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1089,17 +1089,17 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:powder_snow",
+																	"max_threshold": 0.6,
 																	"min_threshold": 0.35,
-																	"max_threshold": 0.6
+																	"noise": "minecraft:powder_snow"
 																},
 																"then_run": {
 																	"type": "minecraft:condition",
 																	"if_true": {
 																		"type": "minecraft:water",
+																		"add_stone_depth": false,
 																		"offset": 0,
-																		"surface_depth_multiplier": 0,
-																		"add_stone_depth": false
+																		"surface_depth_multiplier": 0
 																	},
 																	"then_run": {
 																		"type": "minecraft:block",
@@ -1113,9 +1113,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1154,9 +1154,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1183,17 +1183,17 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:powder_snow",
+																	"max_threshold": 0.6,
 																	"min_threshold": 0.35,
-																	"max_threshold": 0.6
+																	"noise": "minecraft:powder_snow"
 																},
 																"then_run": {
 																	"type": "minecraft:condition",
 																	"if_true": {
 																		"type": "minecraft:water",
+																		"add_stone_depth": false,
 																		"offset": 0,
-																		"surface_depth_multiplier": 0,
-																		"add_stone_depth": false
+																		"surface_depth_multiplier": 0
 																	},
 																	"then_run": {
 																		"type": "minecraft:block",
@@ -1207,9 +1207,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1239,9 +1239,9 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:noise_threshold",
-																			"noise": "minecraft:calcite",
+																			"max_threshold": 0.0125,
 																			"min_threshold": -0.0125,
-																			"max_threshold": 0.0125
+																			"noise": "minecraft:calcite"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -1274,9 +1274,9 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:noise_threshold",
-																			"noise": "minecraft:gravel",
+																			"max_threshold": 0.05,
 																			"min_threshold": -0.05,
-																			"max_threshold": 0.05
+																			"noise": "minecraft:gravel"
 																		},
 																		"then_run": {
 																			"type": "minecraft:sequence",
@@ -1285,10 +1285,10 @@
 																					"type": "minecraft:condition",
 																					"if_true": {
 																						"type": "minecraft:stone_depth",
-																						"offset": 0,
-																						"surface_type": "ceiling",
 																						"add_surface_depth": false,
-																						"secondary_depth_range": 0
+																						"offset": 0,
+																						"secondary_depth_range": 0,
+																						"surface_type": "ceiling"
 																					},
 																					"then_run": {
 																						"type": "minecraft:block",
@@ -1327,9 +1327,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.12121212121212122,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1356,10 +1356,10 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:stone_depth",
-																			"offset": 0,
-																			"surface_type": "ceiling",
 																			"add_surface_depth": false,
-																			"secondary_depth_range": 0
+																			"offset": 0,
+																			"secondary_depth_range": 0,
+																			"surface_type": "ceiling"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -1392,10 +1392,10 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:stone_depth",
-																			"offset": 0,
-																			"surface_type": "ceiling",
 																			"add_surface_depth": false,
-																			"secondary_depth_range": 0
+																			"offset": 0,
+																			"secondary_depth_range": 0,
+																			"surface_type": "ceiling"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -1445,9 +1445,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.21212121212121213,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1460,9 +1460,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": -0.06060606060606061,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1489,9 +1489,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.24242424242424243,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:sequence",
@@ -1500,10 +1500,10 @@
 																			"type": "minecraft:condition",
 																			"if_true": {
 																				"type": "minecraft:stone_depth",
-																				"offset": 0,
-																				"surface_type": "ceiling",
 																				"add_surface_depth": false,
-																				"secondary_depth_range": 0
+																				"offset": 0,
+																				"secondary_depth_range": 0,
+																				"surface_type": "ceiling"
 																			},
 																			"then_run": {
 																				"type": "minecraft:block",
@@ -1525,9 +1525,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.12121212121212122,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1540,9 +1540,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": -0.12121212121212122,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:sequence",
@@ -1551,9 +1551,9 @@
 																			"type": "minecraft:condition",
 																			"if_true": {
 																				"type": "minecraft:water",
+																				"add_stone_depth": false,
 																				"offset": 0,
-																				"surface_depth_multiplier": 0,
-																				"add_stone_depth": false
+																				"surface_depth_multiplier": 0
 																			},
 																			"then_run": {
 																				"type": "minecraft:block",
@@ -1581,10 +1581,10 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:stone_depth",
-																			"offset": 0,
-																			"surface_type": "ceiling",
 																			"add_surface_depth": false,
-																			"secondary_depth_range": 0
+																			"offset": 0,
+																			"secondary_depth_range": 0,
+																			"surface_type": "ceiling"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -1620,9 +1620,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.21212121212121213,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1635,9 +1635,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": -0.11515151515151514,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1664,9 +1664,9 @@
 														"type": "minecraft:condition",
 														"if_true": {
 															"type": "minecraft:water",
+															"add_stone_depth": false,
 															"offset": 0,
-															"surface_depth_multiplier": 0,
-															"add_stone_depth": false
+															"surface_depth_multiplier": 0
 														},
 														"then_run": {
 															"type": "minecraft:block",
@@ -1716,9 +1716,9 @@
 															"type": "minecraft:condition",
 															"if_true": {
 																"type": "minecraft:water",
+																"add_stone_depth": false,
 																"offset": 0,
-																"surface_depth_multiplier": 0,
-																"add_stone_depth": false
+																"surface_depth_multiplier": 0
 															},
 															"then_run": {
 																"type": "minecraft:block",
@@ -1748,9 +1748,9 @@
 							"type": "minecraft:condition",
 							"if_true": {
 								"type": "minecraft:water",
+								"add_stone_depth": true,
 								"offset": -6,
-								"surface_depth_multiplier": -1,
-								"add_stone_depth": true
+								"surface_depth_multiplier": -1
 							},
 							"then_run": {
 								"type": "minecraft:sequence",
@@ -1759,10 +1759,10 @@
 										"type": "minecraft:condition",
 										"if_true": {
 											"type": "minecraft:stone_depth",
-											"offset": 0,
-											"surface_type": "floor",
 											"add_surface_depth": false,
-											"secondary_depth_range": 0
+											"offset": 0,
+											"secondary_depth_range": 0,
+											"surface_type": "floor"
 										},
 										"then_run": {
 											"type": "minecraft:condition",
@@ -1794,10 +1794,10 @@
 										"type": "minecraft:condition",
 										"if_true": {
 											"type": "minecraft:stone_depth",
-											"offset": 0,
-											"surface_type": "floor",
 											"add_surface_depth": true,
-											"secondary_depth_range": 0
+											"offset": 0,
+											"secondary_depth_range": 0,
+											"surface_type": "floor"
 										},
 										"then_run": {
 											"type": "minecraft:sequence",
@@ -1829,9 +1829,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:packed_ice",
+																	"max_threshold": 0.2,
 																	"min_threshold": -0.5,
-																	"max_threshold": 0.2
+																	"noise": "minecraft:packed_ice"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1844,9 +1844,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:ice",
+																	"max_threshold": 0.025,
 																	"min_threshold": -0.0625,
-																	"max_threshold": 0.025
+																	"noise": "minecraft:ice"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1859,9 +1859,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1900,17 +1900,17 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:powder_snow",
+																	"max_threshold": 0.58,
 																	"min_threshold": 0.45,
-																	"max_threshold": 0.58
+																	"noise": "minecraft:powder_snow"
 																},
 																"then_run": {
 																	"type": "minecraft:condition",
 																	"if_true": {
 																		"type": "minecraft:water",
+																		"add_stone_depth": false,
 																		"offset": 0,
-																		"surface_depth_multiplier": 0,
-																		"add_stone_depth": false
+																		"surface_depth_multiplier": 0
 																	},
 																	"then_run": {
 																		"type": "minecraft:block",
@@ -1924,9 +1924,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:water",
+																	"add_stone_depth": false,
 																	"offset": 0,
-																	"surface_depth_multiplier": 0,
-																	"add_stone_depth": false
+																	"surface_depth_multiplier": 0
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -1968,17 +1968,17 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:powder_snow",
+																	"max_threshold": 0.58,
 																	"min_threshold": 0.45,
-																	"max_threshold": 0.58
+																	"noise": "minecraft:powder_snow"
 																},
 																"then_run": {
 																	"type": "minecraft:condition",
 																	"if_true": {
 																		"type": "minecraft:water",
+																		"add_stone_depth": false,
 																		"offset": 0,
-																		"surface_depth_multiplier": 0,
-																		"add_stone_depth": false
+																		"surface_depth_multiplier": 0
 																	},
 																	"then_run": {
 																		"type": "minecraft:block",
@@ -2015,9 +2015,9 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:noise_threshold",
-																			"noise": "minecraft:calcite",
+																			"max_threshold": 0.0125,
 																			"min_threshold": -0.0125,
-																			"max_threshold": 0.0125
+																			"noise": "minecraft:calcite"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -2050,9 +2050,9 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:noise_threshold",
-																			"noise": "minecraft:gravel",
+																			"max_threshold": 0.05,
 																			"min_threshold": -0.05,
-																			"max_threshold": 0.05
+																			"noise": "minecraft:gravel"
 																		},
 																		"then_run": {
 																			"type": "minecraft:sequence",
@@ -2061,10 +2061,10 @@
 																					"type": "minecraft:condition",
 																					"if_true": {
 																						"type": "minecraft:stone_depth",
-																						"offset": 0,
-																						"surface_type": "ceiling",
 																						"add_surface_depth": false,
-																						"secondary_depth_range": 0
+																						"offset": 0,
+																						"secondary_depth_range": 0,
+																						"surface_type": "ceiling"
 																					},
 																					"then_run": {
 																						"type": "minecraft:block",
@@ -2103,9 +2103,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.12121212121212122,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -2132,10 +2132,10 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:stone_depth",
-																			"offset": 0,
-																			"surface_type": "ceiling",
 																			"add_surface_depth": false,
-																			"secondary_depth_range": 0
+																			"offset": 0,
+																			"secondary_depth_range": 0,
+																			"surface_type": "ceiling"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -2168,10 +2168,10 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:stone_depth",
-																			"offset": 0,
-																			"surface_type": "ceiling",
 																			"add_surface_depth": false,
-																			"secondary_depth_range": 0
+																			"offset": 0,
+																			"secondary_depth_range": 0,
+																			"surface_type": "ceiling"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -2218,9 +2218,9 @@
 														"type": "minecraft:condition",
 														"if_true": {
 															"type": "minecraft:noise_threshold",
-															"noise": "minecraft:surface",
+															"max_threshold": 1.7976931348623157E308,
 															"min_threshold": 0.21212121212121213,
-															"max_threshold": 1.7976931348623157e+308
+															"noise": "minecraft:surface"
 														},
 														"then_run": {
 															"type": "minecraft:block",
@@ -2245,9 +2245,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.24242424242424243,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:sequence",
@@ -2256,10 +2256,10 @@
 																			"type": "minecraft:condition",
 																			"if_true": {
 																				"type": "minecraft:stone_depth",
-																				"offset": 0,
-																				"surface_type": "ceiling",
 																				"add_surface_depth": false,
-																				"secondary_depth_range": 0
+																				"offset": 0,
+																				"secondary_depth_range": 0,
+																				"surface_type": "ceiling"
 																			},
 																			"then_run": {
 																				"type": "minecraft:block",
@@ -2281,9 +2281,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": 0.12121212121212122,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -2296,9 +2296,9 @@
 																"type": "minecraft:condition",
 																"if_true": {
 																	"type": "minecraft:noise_threshold",
-																	"noise": "minecraft:surface",
+																	"max_threshold": 1.7976931348623157E308,
 																	"min_threshold": -0.12121212121212122,
-																	"max_threshold": 1.7976931348623157e+308
+																	"noise": "minecraft:surface"
 																},
 																"then_run": {
 																	"type": "minecraft:block",
@@ -2314,10 +2314,10 @@
 																		"type": "minecraft:condition",
 																		"if_true": {
 																			"type": "minecraft:stone_depth",
-																			"offset": 0,
-																			"surface_type": "ceiling",
 																			"add_surface_depth": false,
-																			"secondary_depth_range": 0
+																			"offset": 0,
+																			"secondary_depth_range": 0,
+																			"surface_type": "ceiling"
 																		},
 																		"then_run": {
 																			"type": "minecraft:block",
@@ -2375,10 +2375,10 @@
 											"type": "minecraft:condition",
 											"if_true": {
 												"type": "minecraft:stone_depth",
-												"offset": 0,
-												"surface_type": "floor",
 												"add_surface_depth": true,
-												"secondary_depth_range": 6
+												"offset": 0,
+												"secondary_depth_range": 6,
+												"surface_type": "floor"
 											},
 											"then_run": {
 												"type": "minecraft:block",
@@ -2400,10 +2400,10 @@
 											"type": "minecraft:condition",
 											"if_true": {
 												"type": "minecraft:stone_depth",
-												"offset": 0,
-												"surface_type": "floor",
 												"add_surface_depth": true,
-												"secondary_depth_range": 30
+												"offset": 0,
+												"secondary_depth_range": 30,
+												"surface_type": "floor"
 											},
 											"then_run": {
 												"type": "minecraft:block",
@@ -2420,10 +2420,10 @@
 							"type": "minecraft:condition",
 							"if_true": {
 								"type": "minecraft:stone_depth",
-								"offset": 0,
-								"surface_type": "floor",
 								"add_surface_depth": false,
-								"secondary_depth_range": 0
+								"offset": 0,
+								"secondary_depth_range": 0,
+								"surface_type": "floor"
 							},
 							"then_run": {
 								"type": "minecraft:sequence",
@@ -2461,10 +2461,10 @@
 													"type": "minecraft:condition",
 													"if_true": {
 														"type": "minecraft:stone_depth",
-														"offset": 0,
-														"surface_type": "ceiling",
 														"add_surface_depth": false,
-														"secondary_depth_range": 0
+														"offset": 0,
+														"secondary_depth_range": 0,
+														"surface_type": "ceiling"
 													},
 													"then_run": {
 														"type": "minecraft:block",
@@ -2489,10 +2489,10 @@
 												"type": "minecraft:condition",
 												"if_true": {
 													"type": "minecraft:stone_depth",
-													"offset": 0,
-													"surface_type": "ceiling",
 													"add_surface_depth": false,
-													"secondary_depth_range": 0
+													"offset": 0,
+													"secondary_depth_range": 0,
+													"surface_type": "ceiling"
 												},
 												"then_run": {
 													"type": "minecraft:block",

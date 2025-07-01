@@ -1,25 +1,30 @@
 package net.liopyu.realism.data;
 
 import net.liopyu.realism.util.RegistryUtils;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class JsonFileGenerator {
+    public static List<String> BLOCK_NAMES = new ArrayList<>();
     static {
-        RegistryUtils.BLOCK_NAMES.add("crumbling_cobblestone");
-        RegistryUtils.BLOCK_NAMES.add("broken_cobblestone");
+        BLOCK_NAMES.add("crumbling_cobblestone");
+        BLOCK_NAMES.add("broken_cobblestone");
     }
     public static void main(String[] args) {
-        if (args.length > 0 && "generateAllJson".equals(args[0])) {
-            generateAllJson();
-        }
+        if (!FMLEnvironment.production) return;
+            if (args.length > 0 && "generateAllJson".equals(args[0])) {
+                generateAllJson();
+            }
     }
     public static void generateAllJson() {
-        RegistryUtils.BLOCK_NAMES.forEach((name) -> {
+        if (!FMLEnvironment.production) return;
+        BLOCK_NAMES.forEach((name) -> {
             generateBlockJson(name);
             generateSlabJson(name);
             generateStairsJson(name);
@@ -27,6 +32,7 @@ public class JsonFileGenerator {
         System.out.println("JSON generation complete.");
     }
     public static void generateStairsJson(String name) {
+        if (!FMLEnvironment.production) return;
         generateStairsModelJson(name, "stairs");
         generateStairsModelJson(name + "_inner", "inner_stairs");
         generateStairsModelJson(name + "_outer", "outer_stairs");
@@ -37,6 +43,7 @@ public class JsonFileGenerator {
     }
 
     private static void generateStairsModelJson(String name, String parent) {
+        if (!FMLEnvironment.production) return;
         String path = ASSETS_PATH + "models/block/";
 
         String baseTextureName = name.replace("_stairs_inner", "").replace("_stairs_outer", "").replace("_stairs", "");
@@ -53,6 +60,7 @@ public class JsonFileGenerator {
         writeFile(path, name + ".json", content);
     }
     public static void generateBlockJson(String name) {
+        if (!FMLEnvironment.production) return;
         generateBlockModelJson(name);
 
         String path = ASSETS_PATH + "blockstates/";
@@ -67,9 +75,11 @@ public class JsonFileGenerator {
         generateItemModelJson(name);
     }
     private static void generateBlockModelJson(String name) {
+        if (!FMLEnvironment.production) return;
         generateBlockModelJson(name, "cube_all");
     }
     private static void generateBlockModelJson(String name, String parent) {
+        if (!FMLEnvironment.production) return;
         String path = ASSETS_PATH + "models/block/";
         String content = "{\n" +
                 "  \"parent\": \"block/" + parent + "\",\n" +
@@ -80,6 +90,7 @@ public class JsonFileGenerator {
         writeFile(path, name + ".json", content);
     }
     public static void generateSlabJson(String slabName) {
+        if (!FMLEnvironment.production) return;
         generateSlabModelJson(slabName, "slab");
         generateSlabModelJson(slabName + "_top", "slab_top");
 
@@ -119,6 +130,7 @@ public class JsonFileGenerator {
 
 
     private static void generateSlabModelJson(String name, String parent) {
+        if (!FMLEnvironment.production) return;
         String path = ASSETS_PATH + "models/block/";
         String baseTextureName = name.replace("_slab_top", "").replace("_slab", "");  // Ensure the correct texture name
         String content = "{\n" +
@@ -133,6 +145,7 @@ public class JsonFileGenerator {
     }
 
     private static void generateBlockstateStairsJson(String name) {
+        if (!FMLEnvironment.production) return;
         String path = ASSETS_PATH + "blockstates/";
 
         List<String> facings = Arrays.asList("north", "south", "west", "east");
@@ -230,6 +243,7 @@ public class JsonFileGenerator {
 
 
     private static void generateItemModelJson(String name) {
+        if (!FMLEnvironment.production) return;
         String path = ASSETS_PATH + "models/item/";
         String content = "{\n" +
                 "  \"parent\": \"realism:block/" + name + "\"\n" +
@@ -239,6 +253,7 @@ public class JsonFileGenerator {
     private static final String ASSETS_PATH = "src/main/resources/assets/realism/";
 
     private static void writeFile(String path, String filename, String content) {
+        if (!FMLEnvironment.production) return;
         try {
             String workingDir = System.getProperty("user.dir");
 
