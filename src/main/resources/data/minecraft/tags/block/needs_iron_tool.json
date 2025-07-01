@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "realism:boulder_stone",
+    "realism:boulder_stone_slab",
+    "realism:boulder_stone_stairs",
+    "realism:boulder_stone_wall",
+    "realism:boulder_cobblestone",
+    "realism:boulder_cobblestone_slab",
+    "realism:boulder_cobblestone_stairs",
+    "realism:boulder_cobblestone_wall"
+  ]
+}

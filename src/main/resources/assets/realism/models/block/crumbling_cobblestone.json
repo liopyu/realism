@@ -1,8 +1,6 @@
 {
-  "parent": "block/stairs",
+  "parent": "block/cube_all",
   "textures": {
-    "bottom": "realism:block/crumbling_cobblestone",
-    "top": "realism:block/crumbling_cobblestone",
-    "side": "realism:block/crumbling_cobblestone"
+    "all": "realism:block/crumbling_cobblestone"
   }
 }

@@ -1,8 +1,0 @@
-{
-  "parent": "block/outer_stairs",
-  "textures": {
-    "bottom": "realism:block/crumbling_cobblestone_outer",
-    "top": "realism:block/crumbling_cobblestone_outer",
-    "side": "realism:block/crumbling_cobblestone_outer"
-  }
-}

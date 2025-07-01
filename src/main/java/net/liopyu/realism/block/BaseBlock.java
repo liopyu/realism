@@ -9,4 +9,5 @@ public class BaseBlock extends Block {
     public BaseBlock(BlockBehaviour.Properties properties) {
         super(properties.overrideLootTable(Optional.empty()));
     }
+
 }

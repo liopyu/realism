@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "realism:deep_stone",
+    "realism:deep_stone_slab",
+    "realism:deep_stone_stairs",
+    "realism:deep_stone_wall"
+  ]
+}

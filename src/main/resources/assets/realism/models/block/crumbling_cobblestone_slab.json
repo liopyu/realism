@@ -1,0 +1,8 @@
+{
+  "parent": "block/slab",
+  "textures": {
+    "bottom": "realism:block/crumbling_cobblestone",
+    "top": "realism:block/crumbling_cobblestone",
+    "side": "realism:block/crumbling_cobblestone"
+  }
+}
