@@ -28,8 +28,7 @@ public class JsonFileGenerator {
         TAGSFORBLOCK.put("deep_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_diamond_tool",
-                "minecraft:base_stone_overworld",
-                "minecraft:deepslate_ore_replaceables"
+                "minecraft:base_stone_overworld"
         ));
         TAGSFORBLOCK.put("deep_cobblestone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -38,8 +37,7 @@ public class JsonFileGenerator {
         TAGSFORBLOCK.put("boulder_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_iron_tool",
-                "minecraft:base_stone_overworld",
-                "minecraft:stone_ore_replaceables"
+                "minecraft:base_stone_overworld"
         ));
         TAGSFORBLOCK.put("boulder_cobblestone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -63,11 +61,18 @@ public class JsonFileGenerator {
         ));
 
 
-        BASEBLOCKS.add("realism:deep_diamond_ore");
+        BASEBLOCKS.add("deep_diamond_ore");
+        BASEBLOCKS.add("boulder_diamond_ore");
 
         TAGSFORBLOCK.put("deep_diamond_ore", List.of(
                 "minecraft:mineable/pickaxe",
-                "minecraft:needs_iron_tool"
+                "minecraft:needs_diamond_tool",
+                "realism:deep_ore_replaceables"
+        ));
+        TAGSFORBLOCK.put("boulder_diamond_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool",
+                "realism:boulder_ore_replaceables"
         ));
     }
 
@@ -109,15 +114,19 @@ public class JsonFileGenerator {
             String block = entry.getKey();
             for (String tag : entry.getValue()) {
                 tagToBlocks.computeIfAbsent(tag, t -> new ArrayList<>()).add("realism:" + block);
-                tagToBlocks.computeIfAbsent(tag, t -> new ArrayList<>()).add("realism:" + block + "_slab");
-                tagToBlocks.computeIfAbsent(tag, t -> new ArrayList<>()).add("realism:" + block + "_stairs");
-                tagToBlocks.computeIfAbsent(tag, t -> new ArrayList<>()).add("realism:" + block + "_wall");
+                if (BLOCK_NAMES.contains(block)) {
+                    tagToBlocks.get(tag).add("realism:" + block + "_slab");
+                    tagToBlocks.get(tag).add("realism:" + block + "_stairs");
+                    tagToBlocks.get(tag).add("realism:" + block + "_wall");
+                }
             }
         }
-        String tagBasePath = "src/main/resources/data/minecraft/tags/block/";
         for (var tagEntry : tagToBlocks.entrySet()) {
             String tag = tagEntry.getKey();
-            String tagFile = tag.replace("minecraft:", "");
+            String[] split = tag.split(":", 2);
+            String namespace = split.length == 2 ? split[0] : "minecraft";
+            String tagFile = split.length == 2 ? split[1].replace("block/", "") : tag.replace("block/", "");
+            String tagBasePath = "src/main/resources/data/" + namespace + "/tags/block/";
             StringBuilder content = new StringBuilder("{\n  \"replace\": false,\n  \"values\": [\n");
             List<String> blocks = tagEntry.getValue();
             for (int i = 0; i < blocks.size(); i++) {
@@ -128,7 +137,6 @@ public class JsonFileGenerator {
             content.append("  ]\n}");
             writeFile(tagBasePath, tagFile + ".json", content.toString());
         }
-
     }
 
 
@@ -573,38 +581,30 @@ public class JsonFileGenerator {
         }
     }
 
-
     public static void generateLangFile() {
         String path = "src/main/resources/assets/realism/lang/";
         String filename = "en_us.json";
+        List<String> lines = new ArrayList<>();
+
+        for (String name : BASEBLOCKS) {
+            lines.add("  \"block.realism." + name + "\": \"" + formatLangName(name) + "\"");
+        }
+        for (String name : BLOCK_NAMES) {
+            lines.add("  \"block.realism." + name + "\": \"" + formatLangName(name) + "\"");
+            lines.add("  \"block.realism." + name + "_slab\": \"" + formatLangName(name) + " Slab\"");
+            lines.add("  \"block.realism." + name + "_stairs\": \"" + formatLangName(name) + " Stairs\"");
+            lines.add("  \"block.realism." + name + "_wall\": \"" + formatLangName(name) + " Wall\"");
+        }
+        lines.add("  \"itemGroup.realism\": \"Realism\"");
+
         StringBuilder builder = new StringBuilder();
         builder.append("{\n");
-        for (int i = 0; i < BASEBLOCKS.size(); i++) {
-            String name = BASEBLOCKS.get(i);
-            builder.append("  \"block.realism.").append(name).append("\": \"")
-                    .append(formatLangName(name)).append("\",\n");
-            if (i < BASEBLOCKS.size() - 1) builder.append(",\n");
-            else builder.append("\n");
-        }
-        for (int i = 0; i < BLOCK_NAMES.size(); i++) {
-            String name = BLOCK_NAMES.get(i);
-            builder.append("  \"block.realism.").append(name).append("\": \"")
-                    .append(formatLangName(name)).append("\",\n");
-            builder.append("  \"block.realism.").append(name).append("_slab\": \"")
-                    .append(formatLangName(name)).append(" Slab\",\n");
-            builder.append("  \"block.realism.").append(name).append("_stairs\": \"")
-                    .append(formatLangName(name)).append(" Stairs\",\n");
-            builder.append("  \"block.realism.").append(name).append("_wall\": \"")
-                    .append(formatLangName(name)).append(" Wall\"");
-            if (i < BLOCK_NAMES.size() - 1) builder.append(",\n");
-            else builder.append("\n");
-        }
-
-        builder.append(",\n  \"itemGroup.realism\": \"Realism\"");
-
+        builder.append(String.join(",\n", lines));
         builder.append("\n}\n");
+
         writeFile(path, filename, builder.toString());
     }
+
 
     public static void generateWallsBlockTag() {
         String path = "src/main/resources/data/minecraft/tags/block/";

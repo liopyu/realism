@@ -86,11 +86,23 @@ public class Realism {
                                         .strength(5F, 10F)
                         ),
                         null
+                ),
+                new RegistryUtils.BlockEntry(
+                        "boulder_diamond_ore",
+                        rl -> new Block(
+                                BlockBehaviour.Properties.of()
+                                        .setId(ResourceKey.create(Registries.BLOCK, rl))
+                                        .mapColor(MapColor.STONE)
+                                        .instrument(NoteBlockInstrument.BASEDRUM)
+                                        .requiresCorrectToolForDrops()
+                                        .strength(3F, 7F)
+                        ),
+                        null
                 )
         );
         RegistryUtils.registerBaseBlocks(BLOCKS, ITEMS, oreEntries);
 
-        RegistryUtils.registerAll(BLOCKS, ITEMS, entries, false);
+        RegistryUtils.registerAll(BLOCKS, ITEMS, entries);
 
         TABS.register("realism", () ->
                 CreativeModeTab.builder()
@@ -102,6 +114,9 @@ public class Realism {
                                 output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_slab")).get().value());
                                 output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_stairs")).get().value());
                                 output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_wall")).get().value());
+                            }
+                            for (var entry : oreEntries) {
+                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name())).get().value());
                             }
                         })
                         .build()

@@ -1,4 +1,6 @@
 {
+  "block.realism.deep_diamond_ore": "Deep Diamond Ore",
+  "block.realism.boulder_diamond_ore": "Boulder Diamond Ore",
   "block.realism.deep_stone": "Deep Stone",
   "block.realism.deep_stone_slab": "Deep Stone Slab",
   "block.realism.deep_stone_stairs": "Deep Stone Stairs",
@@ -30,7 +32,6 @@
   "block.realism.broken_cobblestone": "Broken Cobblestone",
   "block.realism.broken_cobblestone_slab": "Broken Cobblestone Slab",
   "block.realism.broken_cobblestone_stairs": "Broken Cobblestone Stairs",
-  "block.realism.broken_cobblestone_wall": "Broken Cobblestone Wall"
-,
+  "block.realism.broken_cobblestone_wall": "Broken Cobblestone Wall",
   "itemGroup.realism": "Realism"
 }

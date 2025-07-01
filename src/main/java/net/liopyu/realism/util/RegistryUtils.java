@@ -38,58 +38,54 @@ public class RegistryUtils {
     public static void registerAll(
             DeferredRegister.Blocks blocks,
             DeferredRegister.Items items,
-            List<BlockEntry> entries,
-            boolean isNormalBlock
+            List<BlockEntry> entries
     ) {
-        if (isNormalBlock) {
-            for (BlockEntry entry : entries) {
-                DeferredHolder<Block, Block> blockHolder = blocks.register(
-                        entry.name,
-                        rl -> entry.blockFactory.apply(rl)
-                );
-                items.registerSimpleBlockItem(entry.name, blockHolder);
+        for (BlockEntry entry : entries) {
+            DeferredHolder<Block, Block> blockHolder = blocks.register(
+                    entry.name,
+                    rl -> entry.blockFactory.apply(rl)
+            );
+            items.registerSimpleBlockItem(entry.name, blockHolder);
 
-                // Stairs
-                DeferredHolder<Block, StairBlock> stairsHolder = blocks.register(
-                        entry.name + "_stairs",
-                        rl -> {
-                            Block baseBlock = blockHolder.get();
-                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
-                                    ? entry.propertiesFactory.apply(baseBlock)
-                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
-                            return new StairBlock(baseBlock.defaultBlockState(), props);
-                        }
-                );
-                items.registerSimpleBlockItem(entry.name + "_stairs", stairsHolder);
+            // Stairs
+            DeferredHolder<Block, StairBlock> stairsHolder = blocks.register(
+                    entry.name + "_stairs",
+                    rl -> {
+                        Block baseBlock = blockHolder.get();
+                        BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                ? entry.propertiesFactory.apply(baseBlock)
+                                : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                        props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                        return new StairBlock(baseBlock.defaultBlockState(), props);
+                    }
+            );
+            items.registerSimpleBlockItem(entry.name + "_stairs", stairsHolder);
 
-                // Slab
-                DeferredHolder<Block, SlabBlock> slabHolder = blocks.register(
-                        entry.name + "_slab",
-                        rl -> {
-                            Block baseBlock = blockHolder.get();
-                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
-                                    ? entry.propertiesFactory.apply(baseBlock)
-                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
-                            return new SlabBlock(props);
-                        }
-                );
-                items.registerSimpleBlockItem(entry.name + "_slab", slabHolder);
-                DeferredHolder<Block, net.minecraft.world.level.block.WallBlock> wallHolder = blocks.register(
-                        entry.name + "_wall",
-                        rl -> {
-                            Block baseBlock = blockHolder.get();
-                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
-                                    ? entry.propertiesFactory.apply(baseBlock)
-                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
-                            return new net.minecraft.world.level.block.WallBlock(props);
-                        }
-                );
-                items.registerSimpleBlockItem(entry.name + "_wall", wallHolder);
-            }
+            // Slab
+            DeferredHolder<Block, SlabBlock> slabHolder = blocks.register(
+                    entry.name + "_slab",
+                    rl -> {
+                        Block baseBlock = blockHolder.get();
+                        BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                ? entry.propertiesFactory.apply(baseBlock)
+                                : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                        props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                        return new SlabBlock(props);
+                    }
+            );
+            items.registerSimpleBlockItem(entry.name + "_slab", slabHolder);
+            DeferredHolder<Block, net.minecraft.world.level.block.WallBlock> wallHolder = blocks.register(
+                    entry.name + "_wall",
+                    rl -> {
+                        Block baseBlock = blockHolder.get();
+                        BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                ? entry.propertiesFactory.apply(baseBlock)
+                                : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                        props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                        return new net.minecraft.world.level.block.WallBlock(props);
+                    }
+            );
+            items.registerSimpleBlockItem(entry.name + "_wall", wallHolder);
         }
-
     }
 }

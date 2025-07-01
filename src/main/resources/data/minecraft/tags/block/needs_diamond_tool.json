@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "realism:deep_diamond_ore",
     "realism:deep_cobblestone",
     "realism:deep_cobblestone_slab",
     "realism:deep_cobblestone_stairs",
