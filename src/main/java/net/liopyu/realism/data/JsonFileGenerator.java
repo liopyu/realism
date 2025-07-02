@@ -90,11 +90,12 @@ public class JsonFileGenerator {
 
     public static void generateAllJson() {
         BASEITEMS.forEach(name -> {
-            generateSimpleItemModelJson(name, "realism:item/name");
+            generateSimpleItemModelJson(name, "realism:item/" + name);
+            generateItemModelJsonToPath(name, "realism:item/" + name);
         });
         BASEBLOCKS.forEach(name -> {
             generateBlockJson(name);
-            generateOreLootTableWithPebbles(name, "minecraft:blocks/diamond_ore", BASEITEMS, 4, 6);
+            generateOreLootTableWithPebble(name, "minecraft:blocks/diamond_ore");
         });
         BLOCK_NAMES.forEach((name) -> {
             generateBlockJson(name);
@@ -117,32 +118,15 @@ public class JsonFileGenerator {
         System.out.println("JSON generation complete.");
     }
 
-    public static void generateOreLootTableWithPebbles(
-            String blockName,
-            String vanillaLootTable,
-            List<String> pebbleItems,
-            int minPebbles,
-            int maxPebbles
-    ) {
+    public static void generateOreLootTableWithPebble(String blockName, String vanillaLootTable) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
-
-        StringBuilder pebbleEntries = new StringBuilder();
-        for (int i = 0; i < pebbleItems.size(); i++) {
-            String pebble = pebbleItems.get(i);
-            pebbleEntries.append(
-                    "        {\n" +
-                            "          \"type\": \"minecraft:item\",\n" +
-                            "          \"name\": \"" + pebble + "\",\n" +
-                            "          \"functions\": [\n" +
-                            "            {\n" +
-                            "              \"function\": \"minecraft:set_count\",\n" +
-                            "              \"count\": { \"min\": " + minPebbles + ", \"max\": " + maxPebbles + " }\n" +
-                            "            },\n" +
-                            "            { \"function\": \"minecraft:explosion_decay\" }\n" +
-                            "          ]\n" +
-                            "        }"
-            );
-            if (i < pebbleItems.size() - 1) pebbleEntries.append(",\n");
+        String pebble;
+        if (blockName.startsWith("deep_")) {
+            pebble = "realism:deep_stone_pebble";
+        } else if (blockName.startsWith("boulder_")) {
+            pebble = "realism:boulder_stone_pebble";
+        } else {
+            pebble = "realism:stone_pebble";
         }
 
         String content =
@@ -155,14 +139,35 @@ public class JsonFileGenerator {
                         "        {\n" +
                         "          \"type\": \"minecraft:loot_table\",\n" +
                         "          \"value\": \"" + vanillaLootTable + "\"\n" +
-                        "        }" +
-                        (pebbleItems.isEmpty() ? "" : ",\n" + pebbleEntries) + "\n" +
+                        "        }\n" +
+                        "      ]\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"rolls\": 1,\n" +
+                        "      \"entries\": [\n" +
+                        "        {\n" +
+                        "          \"type\": \"minecraft:item\",\n" +
+                        "          \"name\": \"" + pebble + "\",\n" +
+                        "          \"functions\": [\n" +
+                        "            {\n" +
+                        "              \"function\": \"minecraft:set_count\",\n" +
+                        "              \"count\": {\n" +
+                        "                \"type\": \"minecraft:uniform\",\n" +
+                        "                \"min\": 4,\n" +
+                        "                \"max\": 6\n" +
+                        "              }\n" +
+                        "            },\n" +
+                        "            { \"function\": \"minecraft:explosion_decay\" }\n" +
+                        "          ]\n" +
+                        "        }\n" +
                         "      ]\n" +
                         "    }\n" +
                         "  ]\n" +
                         "}";
+
         writeFile(path, blockName + ".json", content);
     }
+
 
     public static void generateSimpleItemModelJson(String itemName, String textureName) {
         String path = ASSETS_PATH + "models/item/";
@@ -226,9 +231,17 @@ public class JsonFileGenerator {
         }
     }
 
-
     public static void generateStoneLikeLootTableJson(String name) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
+        String pebble;
+        if (name.startsWith("deep_")) {
+            pebble = "realism:deep_stone_pebble";
+        } else if (name.startsWith("boulder_")) {
+            pebble = "realism:boulder_stone_pebble";
+        } else {
+            pebble = "realism:stone_pebble";
+        }
+
         String content =
                 "{\n" +
                         "  \"type\": \"minecraft:block\",\n" +
@@ -271,12 +284,37 @@ public class JsonFileGenerator {
                         "        }\n" +
                         "      ],\n" +
                         "      \"rolls\": 1.0\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"bonus_rolls\": 0.0,\n" +
+                        "      \"entries\": [\n" +
+                        "        {\n" +
+                        "          \"type\": \"minecraft:item\",\n" +
+                        "          \"name\": \"" + pebble + "\",\n" +
+                        "          \"functions\": [\n" +
+                        "            {\n" +
+                        "              \"function\": \"minecraft:set_count\",\n" +
+                        "              \"count\": {\n" +
+                        "                \"type\": \"minecraft:uniform\",\n" +
+                        "                \"min\": 4,\n" +
+                        "                \"max\": 6\n" +
+                        "              }\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "              \"function\": \"minecraft:explosion_decay\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        }\n" +
+                        "      ],\n" +
+                        "      \"rolls\": 1.0\n" +
                         "    }\n" +
                         "  ],\n" +
                         "  \"random_sequence\": \"realism:blocks/" + name + "\"\n" +
                         "}";
+
         writeFile(path, name + ".json", content);
     }
+
 
     public static void generateCobbleLikeLootTableJson(String name) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
@@ -665,6 +703,165 @@ public class JsonFileGenerator {
                     "}";
 
             writeFile(path, wallName + ".json", wallJson);
+            String pebbleRecipePath = "src/main/resources/data/realism/recipe/";
+
+            String boulderPebbleRecipe =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:boulder_stone_pebble\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"##\",\n" +
+                            "    \"##\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 1,\n" +
+                            "    \"id\": \"realism:boulder_cobblestone_slab\"\n" +
+                            "  }\n" +
+                            "}";
+
+            String deepPebbleRecipe =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:deep_stone_pebble\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"##\",\n" +
+                            "    \"##\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 1,\n" +
+                            "    \"id\": \"realism:deep_cobblestone_slab\"\n" +
+                            "  }\n" +
+                            "}";
+
+            writeFile(pebbleRecipePath, "boulder_stone_pebble_to_slab.json", boulderPebbleRecipe);
+            writeFile(pebbleRecipePath, "deep_stone_pebble_to_slab.json", deepPebbleRecipe);
+            String stonePebbleRecipe =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:stone_pebble\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"##\",\n" +
+                            "    \"##\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 1,\n" +
+                            "    \"id\": \"realism:loose_cobblestone_slab\"\n" +
+                            "  }\n" +
+                            "}";
+
+            writeFile(pebbleRecipePath, "stone_pebble_to_slab.json", stonePebbleRecipe);
+            String deepStonePebbleBack =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:deep_cobblestone_slab\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 4,\n" +
+                            "    \"id\": \"realism:deep_stone_pebble\"\n" +
+                            "  }\n" +
+                            "}";
+
+            String boulderStonePebbleBack =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:boulder_cobblestone_slab\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 4,\n" +
+                            "    \"id\": \"realism:boulder_stone_pebble\"\n" +
+                            "  }\n" +
+                            "}";
+
+            String stonePebbleBack =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:loose_cobblestone_slab\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 4,\n" +
+                            "    \"id\": \"realism:stone_pebble\"\n" +
+                            "  }\n" +
+                            "}";
+
+            writeFile(pebbleRecipePath, "deep_stone_slab_to_pebbles.json", deepStonePebbleBack);
+            writeFile(pebbleRecipePath, "boulder_stone_slab_to_pebbles.json", boulderStonePebbleBack);
+            writeFile(pebbleRecipePath, "loose_cobblestone_slab_to_pebbles.json", stonePebbleBack);
+            String deepCobblestoneToPebbles =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:deep_cobblestone\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 8,\n" +
+                            "    \"id\": \"realism:deep_stone_pebble\"\n" +
+                            "  }\n" +
+                            "}";
+
+            String boulderCobblestoneToPebbles =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:boulder_cobblestone\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 8,\n" +
+                            "    \"id\": \"realism:boulder_stone_pebble\"\n" +
+                            "  }\n" +
+                            "}";
+
+            String looseCobblestoneToPebbles =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:loose_cobblestone\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 8,\n" +
+                            "    \"id\": \"realism:stone_pebble\"\n" +
+                            "  }\n" +
+                            "}";
+
+            writeFile(path, "deep_cobblestone_to_pebbles.json", deepCobblestoneToPebbles);
+            writeFile(path, "boulder_cobblestone_to_pebbles.json", boulderCobblestoneToPebbles);
+            writeFile(path, "loose_cobblestone_to_pebbles.json", looseCobblestoneToPebbles);
+
         }
     }
 
@@ -672,6 +869,9 @@ public class JsonFileGenerator {
         String path = "src/main/resources/assets/realism/lang/";
         String filename = "en_us.json";
         List<String> lines = new ArrayList<>();
+        for (String name : BASEITEMS) {
+            lines.add("  \"item.realism." + name + "\": \"" + formatLangName(name) + "\"");
+        }
 
         for (String name : BASEBLOCKS) {
             lines.add("  \"block.realism." + name + "\": \"" + formatLangName(name) + "\"");
@@ -776,6 +976,18 @@ public class JsonFileGenerator {
                         "  \"model\": {\n" +
                         "    \"type\": \"minecraft:model\",\n" +
                         "    \"model\": \"realism:block/" + finalName + "\"\n" +
+                        "  }\n" +
+                        "}";
+        writeFile(path, name + ".json", content);
+    }
+
+    private static void generateItemModelJsonToPath(String name, String p) {
+        String path = ASSETS_PATH + "items/";
+        String content =
+                "{\n" +
+                        "  \"model\": {\n" +
+                        "    \"type\": \"minecraft:model\",\n" +
+                        "    \"model\": \"" + p + "\"\n" +
                         "  }\n" +
                         "}";
         writeFile(path, name + ".json", content);

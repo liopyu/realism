@@ -14,6 +14,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.util.List;
 import java.util.function.Function;
 
+import static net.liopyu.realism.Realism.MODID;
+
 public class RegistryUtils {
     public record BlockEntry(
             String name,
@@ -27,7 +29,7 @@ public class RegistryUtils {
             List<String> names
     ) {
         for (String name : names) {
-            items.register(name, () -> new Item(new Item.Properties().stacksTo(64)));
+            items.register(name, () -> new Item(new Item.Properties().stacksTo(64).setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MODID, name)))));
         }
     }
 

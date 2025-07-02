@@ -1,4 +1,7 @@
 {
+  "item.realism.stone_pebble": "Stone Pebble",
+  "item.realism.deep_stone_pebble": "Deep Stone Pebble",
+  "item.realism.boulder_stone_pebble": "Boulder Stone Pebble",
   "block.realism.deep_diamond_ore": "Deep Diamond Ore",
   "block.realism.boulder_diamond_ore": "Boulder Diamond Ore",
   "block.realism.deep_stone": "Deep Stone",

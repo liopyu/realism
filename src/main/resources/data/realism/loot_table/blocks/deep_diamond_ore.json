@@ -7,36 +7,23 @@
         {
           "type": "minecraft:loot_table",
           "value": "minecraft:blocks/diamond_ore"
-        },
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
         {
           "type": "minecraft:item",
-          "name": "stone_pebble",
+          "name": "realism:deep_stone_pebble",
           "functions": [
             {
               "function": "minecraft:set_count",
-              "count": { "min": 4, "max": 6 }
-            },
-            { "function": "minecraft:explosion_decay" }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "deep_stone_pebble",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 4, "max": 6 }
-            },
-            { "function": "minecraft:explosion_decay" }
-          ]
-        },
-        {
-          "type": "minecraft:item",
-          "name": "boulder_stone_pebble",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 4, "max": 6 }
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 4,
+                "max": 6
+              }
             },
             { "function": "minecraft:explosion_decay" }
           ]
