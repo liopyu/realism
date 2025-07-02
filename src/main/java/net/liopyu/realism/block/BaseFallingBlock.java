@@ -1,36 +1,40 @@
 package net.liopyu.realism.block;
 
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.SlabType;
 
-public class BaseFallingSlab extends SlabBlock implements Fallable {
-    public final Block cobblestoneBlock;
+import static net.liopyu.realism.Realism.MODID;
 
-    public BaseFallingSlab(Properties properties, Block cobblestoneBlock) {
+public class BaseFallingBlock extends Block implements Fallable {
+    public Block cobbledSlab;
+
+    public BaseFallingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.cobblestoneBlock = cobblestoneBlock;
+    }
+
+    public void setCobbledSlab(Block cobbledSlab) {
+        this.cobbledSlab = cobbledSlab;
     }
 
     @Override
-    public MapCodec<? extends SlabBlock> codec() {
+    public MapCodec<? extends Block> codec() {
         return null;
     }
 
@@ -74,7 +78,6 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
         }
     }
 
-
     protected void falling(FallingBlockEntity entity) {
     }
 
@@ -82,46 +85,29 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
         return 2;
     }
 
-    public static boolean isFree(BlockState state) {
-        return state.isAir() || state.is(BlockTags.FIRE) || state.liquid() || state.canBeReplaced();
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        BlockState state = super.getStateForPlacement(ctx);
-        if (state != null && state.getBlock() instanceof BaseFallingSlab) {
-            BlockPos pos = ctx.getClickedPos();
-            Level level = ctx.getLevel();
-            BlockState below = level.getBlockState(pos.below());
-
-            if (state.getValue(TYPE) == SlabType.TOP && below.isFaceSturdy(level, pos.below(), Direction.UP)) {
-                return state.setValue(TYPE, SlabType.BOTTOM);
-            }
-        }
-        return state;
-    }
-
-
     @Override
     public void onLand(Level level, BlockPos pos, BlockState fallingState, BlockState landedOn, FallingBlockEntity entity) {
         BlockPos below = pos.below();
         BlockState belowState = level.getBlockState(below);
-        if (belowState.getBlock() == this && belowState.hasProperty(TYPE) && belowState.getValue(TYPE) == SlabType.BOTTOM) {
-            level.setBlockAndUpdate(below, cobblestoneBlock.defaultBlockState());
-            level.setBlockAndUpdate(pos, cobblestoneBlock.defaultBlockState());
 
+        // Merge if landing on cobbled slab
+        if (belowState.getBlock() == cobbledSlab) {
+            // Replace below with full block (this)
+            level.setBlockAndUpdate(below, this.defaultBlockState());
+            // Place a cobbled slab above, in the "bottom" position
+            BlockPos above = below.above();
+            BlockState slabState = cobbledSlab.defaultBlockState();
+            if (slabState.hasProperty(SlabBlock.TYPE))
+                slabState = slabState.setValue(SlabBlock.TYPE, net.minecraft.world.level.block.state.properties.SlabType.BOTTOM);
+            level.setBlockAndUpdate(above, slabState);
+            // Remove the falling block entity, don't place itself at landing pos
+            level.removeBlock(pos, false);
         } else {
-            BlockState placeState = fallingState;
-            if (fallingState.hasProperty(TYPE) && fallingState.getValue(TYPE) != SlabType.BOTTOM) {
-                placeState = fallingState.setValue(TYPE, SlabType.BOTTOM);
-            }
-            level.setBlockAndUpdate(pos, placeState);
+            // Place as normal falling block if not merging
+            level.setBlockAndUpdate(pos, fallingState);
         }
     }
 
-    /**
-     * Called periodically clientside on blocks near the player to show effects (like furnace fire particles).
-     */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (random.nextInt(16) == 0) {
@@ -136,4 +122,7 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
         return 0;
     }
 
+    public static boolean isFree(BlockState state) {
+        return state.isAir() || state.is(BlockTags.FIRE) || state.liquid() || state.canBeReplaced();
+    }
 }

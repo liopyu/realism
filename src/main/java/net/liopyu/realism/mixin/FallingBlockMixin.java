@@ -1,8 +1,11 @@
 package net.liopyu.realism.mixin;
 
 import net.liopyu.realism.block.BaseFallingSlab;
+import net.liopyu.realism.util.RealismHelperClass;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
@@ -20,6 +23,12 @@ public class FallingBlockMixin {
     private void realism$slabMerge(CallbackInfo ci) {
         FallingBlockEntity self = (FallingBlockEntity) (Object) this;
         mergeFunction(ci, self);
+    }
+
+    @Inject(method = "callOnBrokenAfterFall", at = @At("HEAD"), cancellable = true)
+    private void realism$preventDropOnMerge(Block block, BlockPos pos, CallbackInfo ci) {
+        FallingBlockEntity self = (FallingBlockEntity) (Object) this;
+        RealismHelperClass.handlePreventDropOnMerge(block, pos, self, ci);
     }
 
 

@@ -1,6 +1,5 @@
 package net.liopyu.realism.block;
 
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,26 +10,23 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Fallable;
+import net.minecraft.world.level.block.FenceBlock;
+import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.SlabType;
 
-public class BaseFallingSlab extends SlabBlock implements Fallable {
-    public final Block cobblestoneBlock;
-
-    public BaseFallingSlab(Properties properties, Block cobblestoneBlock) {
+public class BaseFallingWall extends WallBlock implements Fallable {
+    public BaseFallingWall(BlockBehaviour.Properties properties) {
         super(properties);
-        this.cobblestoneBlock = cobblestoneBlock;
     }
 
     @Override
-    public MapCodec<? extends SlabBlock> codec() {
+    public MapCodec<WallBlock> codec() {
         return null;
     }
 
@@ -58,6 +54,7 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         BlockPos below = pos.below();
         BlockState stateBelow = level.getBlockState(below);
+
         boolean supported =
                 stateBelow.isFaceSturdy(level, below, Direction.UP)
                         || stateBelow.getBlock() instanceof WallBlock
@@ -68,6 +65,7 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
                         || stateBelow.is(BlockTags.FENCE_GATES)
                         || stateBelow.is(BlockTags.DOORS)
                         || stateBelow.getCollisionShape(level, below).max(Direction.Axis.Y) >= 1.0;
+
         if (!supported) {
             FallingBlockEntity fallingblockentity = FallingBlockEntity.fall(level, pos, state);
             this.falling(fallingblockentity);
@@ -82,46 +80,11 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
         return 2;
     }
 
-    public static boolean isFree(BlockState state) {
-        return state.isAir() || state.is(BlockTags.FIRE) || state.liquid() || state.canBeReplaced();
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        BlockState state = super.getStateForPlacement(ctx);
-        if (state != null && state.getBlock() instanceof BaseFallingSlab) {
-            BlockPos pos = ctx.getClickedPos();
-            Level level = ctx.getLevel();
-            BlockState below = level.getBlockState(pos.below());
-
-            if (state.getValue(TYPE) == SlabType.TOP && below.isFaceSturdy(level, pos.below(), Direction.UP)) {
-                return state.setValue(TYPE, SlabType.BOTTOM);
-            }
-        }
-        return state;
-    }
-
-
     @Override
     public void onLand(Level level, BlockPos pos, BlockState fallingState, BlockState landedOn, FallingBlockEntity entity) {
-        BlockPos below = pos.below();
-        BlockState belowState = level.getBlockState(below);
-        if (belowState.getBlock() == this && belowState.hasProperty(TYPE) && belowState.getValue(TYPE) == SlabType.BOTTOM) {
-            level.setBlockAndUpdate(below, cobblestoneBlock.defaultBlockState());
-            level.setBlockAndUpdate(pos, cobblestoneBlock.defaultBlockState());
-
-        } else {
-            BlockState placeState = fallingState;
-            if (fallingState.hasProperty(TYPE) && fallingState.getValue(TYPE) != SlabType.BOTTOM) {
-                placeState = fallingState.setValue(TYPE, SlabType.BOTTOM);
-            }
-            level.setBlockAndUpdate(pos, placeState);
-        }
+        level.setBlockAndUpdate(pos, fallingState);
     }
 
-    /**
-     * Called periodically clientside on blocks near the player to show effects (like furnace fire particles).
-     */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (random.nextInt(16) == 0) {
@@ -136,4 +99,7 @@ public class BaseFallingSlab extends SlabBlock implements Fallable {
         return 0;
     }
 
+    public static boolean isFree(BlockState state) {
+        return state.isAir() || state.is(BlockTags.FIRE) || state.liquid() || state.canBeReplaced();
+    }
 }

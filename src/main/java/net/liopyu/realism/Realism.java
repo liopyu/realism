@@ -2,6 +2,7 @@ package net.liopyu.realism;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.util.RegistryUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -57,17 +58,7 @@ public class Realism {
                     }
 
                     if (isFalling) {
-                        return new FallingBlock(props) {
-                            @Override
-                            protected MapCodec<? extends FallingBlock> codec() {
-                                return null;
-                            }
-
-                            @Override
-                            public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
-                                return 0;
-                            }
-                        };
+                        return new BaseFallingBlock(props);
                     } else {
                         return new Block(props);
                     }

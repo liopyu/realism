@@ -1,6 +1,8 @@
 package net.liopyu.realism.util;
 
+import com.mojang.logging.LogUtils;
 import net.liopyu.realism.Realism;
+import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.block.BaseFallingSlab;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.BlockPos;
@@ -269,23 +271,45 @@ public class RealismHelperClass {
         goalSelector.getAvailableGoals().removeIf((p_262564_) -> p_262575_.test(p_262564_.getGoal()));
     }
 
+    public static void handlePreventDropOnMerge(Block block, BlockPos pos, FallingBlockEntity self, CallbackInfo ci) {
+        BlockState state = self.getBlockState();
+        BlockState landingState = self.level().getBlockState(pos);
+        if (state.getBlock() instanceof BaseFallingSlab && landingState.getBlock() == state.getBlock()) {
+            if (landingState.hasProperty(SlabBlock.TYPE) && landingState.getValue(SlabBlock.TYPE) == SlabType.BOTTOM) {
+                BaseFallingSlab fallingSlab = (BaseFallingSlab) state.getBlock();
+                self.level().setBlockAndUpdate(pos, fallingSlab.cobblestoneBlock.defaultBlockState());
+                ci.cancel();
+            }
+        }
+    }
+
+
     public static void mergeFunction(CallbackInfo ci, FallingBlockEntity self) {
         BlockPos pos = self.blockPosition();
         BlockPos below = pos.below();
         BlockState blockState = self.getBlockState();
         BlockState belowState = self.level().getBlockState(below);
 
-        double threshold = 0.3;
         if (blockState.getBlock() instanceof BaseFallingSlab && belowState.getBlock() == blockState.getBlock()) {
             if (belowState.hasProperty(SlabBlock.TYPE) && belowState.getValue(SlabBlock.TYPE) == SlabType.BOTTOM) {
-                double dy = self.getY() - (below.getY() + 1);
-                if (dy > -threshold && dy < threshold) {
-                    BaseFallingSlab fallingSlab = (BaseFallingSlab) blockState.getBlock();
-                    self.level().setBlockAndUpdate(below, fallingSlab.cobblestoneBlock.defaultBlockState());
-                    self.discard();
+                BaseFallingSlab fallingSlab = (BaseFallingSlab) blockState.getBlock();
+                self.level().setBlockAndUpdate(below, fallingSlab.cobblestoneBlock.defaultBlockState());
+                self.discard();
+                return;
+            }
+        }
+        if (blockState.getBlock() instanceof BaseFallingBlock fallingBlock) {
+            Block slab = fallingBlock.cobbledSlab;
+            if (belowState.getBlock() == slab) {
+                self.level().setBlockAndUpdate(below, blockState);
+                BlockPos above = below.above();
+                BlockState slabState = slab.defaultBlockState();
+                if (slabState.hasProperty(SlabBlock.TYPE)) {
+                    slabState = slabState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
                 }
+                self.level().setBlockAndUpdate(above, slabState);
+                self.discard();
             }
         }
     }
-
 }

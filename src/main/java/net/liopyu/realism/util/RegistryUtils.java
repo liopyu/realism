@@ -1,6 +1,9 @@
 package net.liopyu.realism.util;
 
+import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.block.BaseFallingSlab;
+import net.liopyu.realism.block.BaseFallingStair;
+import net.liopyu.realism.block.BaseFallingWall;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -59,20 +62,6 @@ public class RegistryUtils {
                     rl -> entry.blockFactory.apply(rl)
             );
             items.registerSimpleBlockItem(entry.name, blockHolder);
-
-            // Stairs
-            DeferredHolder<Block, StairBlock> stairsHolder = blocks.register(
-                    entry.name + "_stairs",
-                    rl -> {
-                        Block baseBlock = blockHolder.get();
-                        BlockBehaviour.Properties props = (entry.propertiesFactory != null)
-                                ? entry.propertiesFactory.apply(baseBlock)
-                                : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                        props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
-                        return new StairBlock(baseBlock.defaultBlockState(), props);
-                    }
-            );
-            items.registerSimpleBlockItem(entry.name + "_stairs", stairsHolder);
             if (entry.name.endsWith("_cobblestone")) {
                 // Slab
                 DeferredHolder<Block, SlabBlock> slabHolder = blocks.register(
@@ -83,11 +72,40 @@ public class RegistryUtils {
                                     ? entry.propertiesFactory.apply(baseBlock)
                                     : BlockBehaviour.Properties.ofFullCopy(baseBlock);
                             props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
-                            return new BaseFallingSlab(props, blockHolder.get());
+                            var cobbledSlab = new BaseFallingSlab(props, blockHolder.get());
+                            if (blockHolder.get() instanceof BaseFallingBlock baseFallingBlock) {
+                                baseFallingBlock.setCobbledSlab(cobbledSlab);
+                            }
+                            return cobbledSlab;
                         }
                 );
 
                 items.registerSimpleBlockItem(entry.name + "_slab", slabHolder);
+                // Stairs
+                DeferredHolder<Block, StairBlock> stairsHolder = blocks.register(
+                        entry.name + "_stairs",
+                        rl -> {
+                            Block baseBlock = blockHolder.get();
+                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                    ? entry.propertiesFactory.apply(baseBlock)
+                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                            return new BaseFallingStair(baseBlock.defaultBlockState(), props);
+                        }
+                );
+                items.registerSimpleBlockItem(entry.name + "_stairs", stairsHolder);
+                DeferredHolder<Block, net.minecraft.world.level.block.WallBlock> wallHolder = blocks.register(
+                        entry.name + "_wall",
+                        rl -> {
+                            Block baseBlock = blockHolder.get();
+                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                    ? entry.propertiesFactory.apply(baseBlock)
+                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                            return new BaseFallingWall(props);
+                        }
+                );
+                items.registerSimpleBlockItem(entry.name + "_wall", wallHolder);
             } else {
                 // Slab
                 DeferredHolder<Block, SlabBlock> slabHolder = blocks.register(
@@ -103,19 +121,33 @@ public class RegistryUtils {
                 );
 
                 items.registerSimpleBlockItem(entry.name + "_slab", slabHolder);
+                // Stairs
+                DeferredHolder<Block, StairBlock> stairsHolder = blocks.register(
+                        entry.name + "_stairs",
+                        rl -> {
+                            Block baseBlock = blockHolder.get();
+                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                    ? entry.propertiesFactory.apply(baseBlock)
+                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                            return new StairBlock(baseBlock.defaultBlockState(), props);
+                        }
+                );
+                items.registerSimpleBlockItem(entry.name + "_stairs", stairsHolder);
+                DeferredHolder<Block, net.minecraft.world.level.block.WallBlock> wallHolder = blocks.register(
+                        entry.name + "_wall",
+                        rl -> {
+                            Block baseBlock = blockHolder.get();
+                            BlockBehaviour.Properties props = (entry.propertiesFactory != null)
+                                    ? entry.propertiesFactory.apply(baseBlock)
+                                    : BlockBehaviour.Properties.ofFullCopy(baseBlock);
+                            props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
+                            return new net.minecraft.world.level.block.WallBlock(props);
+                        }
+                );
+                items.registerSimpleBlockItem(entry.name + "_wall", wallHolder);
             }
-            DeferredHolder<Block, net.minecraft.world.level.block.WallBlock> wallHolder = blocks.register(
-                    entry.name + "_wall",
-                    rl -> {
-                        Block baseBlock = blockHolder.get();
-                        BlockBehaviour.Properties props = (entry.propertiesFactory != null)
-                                ? entry.propertiesFactory.apply(baseBlock)
-                                : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                        props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
-                        return new net.minecraft.world.level.block.WallBlock(props);
-                    }
-            );
-            items.registerSimpleBlockItem(entry.name + "_wall", wallHolder);
+
         }
     }
 }
