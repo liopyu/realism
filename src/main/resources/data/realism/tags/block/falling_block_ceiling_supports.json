@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "realism:deep_stone",
+    "realism:boulder_stone",
+    "realism:cracked_stone",
+    "realism:crumbling_stone",
+    "realism:broken_stone"
+  ]
+}

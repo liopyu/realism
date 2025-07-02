@@ -1,0 +1,8 @@
+{
+  "parent": "block/slab_top",
+  "textures": {
+    "bottom": "realism:block/broken_stone",
+    "top": "realism:block/broken_stone",
+    "side": "realism:block/broken_stone"
+  }
+}

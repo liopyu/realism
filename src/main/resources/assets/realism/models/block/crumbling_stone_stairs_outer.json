@@ -1,0 +1,8 @@
+{
+  "parent": "block/outer_stairs",
+  "textures": {
+    "bottom": "realism:block/crumbling_stone",
+    "top": "realism:block/crumbling_stone",
+    "side": "realism:block/crumbling_stone"
+  }
+}
