@@ -5,10 +5,16 @@
     "realism:boulder_stone_slab",
     "realism:boulder_stone_stairs",
     "realism:boulder_stone_wall",
+    "realism:boulder_redstone_ore",
+    "realism:boulder_emerald_ore",
+    "realism:boulder_gold_ore",
+    "realism:deep_emerald_ore",
     "realism:boulder_cobblestone",
     "realism:boulder_cobblestone_slab",
     "realism:boulder_cobblestone_stairs",
     "realism:boulder_cobblestone_wall",
-    "realism:boulder_diamond_ore"
+    "realism:boulder_diamond_ore",
+    "realism:deep_gold_ore",
+    "realism:deep_redstone_ore"
   ]
 }

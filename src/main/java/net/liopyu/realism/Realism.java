@@ -1,10 +1,8 @@
 package net.liopyu.realism;
 
 import com.mojang.logging.LogUtils;
-import com.mojang.serialization.MapCodec;
 import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.util.RegistryUtils;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -12,26 +10,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
-import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static net.liopyu.realism.data.JsonFileGenerator.BLOCK_NAMES;
 
 @Mod(Realism.MODID)
 public class Realism {
@@ -58,11 +47,31 @@ public class Realism {
                     }
 
                     if (isFalling) {
-                        return new BaseFallingBlock(props);
+                        var block = new BaseFallingBlock(props, true);
+                        block.setRegistryName(name);
+                        return block;
                     } else {
-                        return new Block(props);
+                        var block = new BaseFallingBlock(props, false);
+                        block.setRegistryName(name);
+                        return block;
                     }
                 },
+                null
+        );
+    }
+
+    private static RegistryUtils.BlockEntry oreEntry(String name, float strength, float resistance, int xpMin, int xpMax) {
+        return new RegistryUtils.BlockEntry(
+                name,
+                rl -> new DropExperienceBlock(
+                        UniformInt.of(xpMin, xpMax),
+                        BlockBehaviour.Properties.of()
+                                .setId(ResourceKey.create(Registries.BLOCK, rl))
+                                .mapColor(MapColor.STONE)
+                                .instrument(NoteBlockInstrument.BASEDRUM)
+                                .requiresCorrectToolForDrops()
+                                .strength(strength, resistance)
+                ),
                 null
         );
     }
@@ -82,36 +91,30 @@ public class Realism {
                 cobbleEntry("boulder_stone", 3F, 7F, true, false),
                 cobbleEntry("boulder_cobblestone", 2F, 6F, false, true),
                 cobbleEntry("loose_cobblestone", 1F, 5F, false, true),
-                cobbleEntry("cracked_cobblestone", 1.5F, 6F, true, false),
-                cobbleEntry("crumbling_cobblestone", 1.5F, 6F, true, false),
-                cobbleEntry("broken_cobblestone", 1.5F, 6F, true, false)
+                cobbleEntry("cracked_stone", 1.5F, 6F, true, false),
+                cobbleEntry("crumbling_stone", 1.5F, 6F, true, false),
+                cobbleEntry("broken_stone", 1.5F, 6F, true, false)
         );
         List<RegistryUtils.BlockEntry> oreEntries = List.of(
-                new RegistryUtils.BlockEntry(
-                        "deep_diamond_ore",
-                        rl -> new DropExperienceBlock(UniformInt.of(3, 7),
-                                BlockBehaviour.Properties.of()
-                                        .setId(ResourceKey.create(Registries.BLOCK, rl))
-                                        .mapColor(MapColor.STONE)
-                                        .instrument(NoteBlockInstrument.BASEDRUM)
-                                        .requiresCorrectToolForDrops()
-                                        .strength(5F, 10F)
-                        ),
-                        null
-                ),
-                new RegistryUtils.BlockEntry(
-                        "boulder_diamond_ore",
-                        rl -> new DropExperienceBlock(UniformInt.of(3, 7),
-                                BlockBehaviour.Properties.of()
-                                        .setId(ResourceKey.create(Registries.BLOCK, rl))
-                                        .mapColor(MapColor.STONE)
-                                        .instrument(NoteBlockInstrument.BASEDRUM)
-                                        .requiresCorrectToolForDrops()
-                                        .strength(3F, 7F)
-                        ),
-                        null
-                )
+                oreEntry("deep_diamond_ore", 5F, 10F, 3, 7),
+                oreEntry("boulder_diamond_ore", 3F, 7F, 3, 7),
+                oreEntry("deep_iron_ore", 5F, 10F, 0, 0),
+                oreEntry("boulder_iron_ore", 3F, 7F, 0, 0),
+                oreEntry("deep_gold_ore", 5F, 10F, 0, 0),
+                oreEntry("boulder_gold_ore", 3F, 7F, 0, 0),
+                oreEntry("deep_copper_ore", 5F, 10F, 0, 0),
+                oreEntry("boulder_copper_ore", 3F, 7F, 0, 0),
+                oreEntry("deep_coal_ore", 5F, 10F, 0, 2),
+                oreEntry("boulder_coal_ore", 3F, 7F, 0, 2),
+                oreEntry("deep_emerald_ore", 5F, 10F, 3, 7),
+                oreEntry("boulder_emerald_ore", 3F, 7F, 3, 7),
+                oreEntry("deep_lapis_ore", 5F, 10F, 2, 5),
+                oreEntry("boulder_lapis_ore", 3F, 7F, 2, 5),
+                oreEntry("deep_redstone_ore", 5F, 10F, 1, 5),
+                oreEntry("boulder_redstone_ore", 3F, 7F, 1, 5)
         );
+
+
         RegistryUtils.registerBaseBlocks(BLOCKS, ITEMS, oreEntries);
 
         RegistryUtils.registerAll(BLOCKS, ITEMS, entries);

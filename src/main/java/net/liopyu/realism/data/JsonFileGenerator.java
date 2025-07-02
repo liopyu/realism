@@ -22,10 +22,29 @@ public class JsonFileGenerator {
         BLOCK_NAMES.add("boulder_stone");
         BLOCK_NAMES.add("boulder_cobblestone");
         BLOCK_NAMES.add("loose_cobblestone");
-        BLOCK_NAMES.add("cracked_cobblestone");
-        BLOCK_NAMES.add("crumbling_cobblestone");
-        BLOCK_NAMES.add("broken_cobblestone");
-
+        BLOCK_NAMES.add("cracked_stone");
+        BLOCK_NAMES.add("crumbling_stone");
+        BLOCK_NAMES.add("broken_stone");
+        generateBlockTag("realism:falling_block_ceiling_supports", List.of(
+                "deep_stone",
+                "boulder_stone",
+                "cracked_stone",
+                "crumbling_stone",
+                "broken_stone"
+        ));
+        generateBlockTag(
+                "realism:deep_ore_replaceables", List.of(
+                        "deep_stone"
+                ));
+        generateBlockTag(
+                "realism:boulder_ore_replaceables", List.of(
+                        "boulder_stone"
+                ));
+        generateBlockTag(
+                "minecraft:base_stone_overworld", List.of(
+                        "boulder_stone",
+                        "deep_stone"
+                ));
         for (String name : BLOCK_NAMES) {
             if (name.endsWith("_cobblestone")) {
                 TAGSFORITEM.put(name, List.of("minecraft:stone_tool_materials"));
@@ -34,9 +53,8 @@ public class JsonFileGenerator {
 
         TAGSFORBLOCK.put("deep_stone", List.of(
                 "minecraft:mineable/pickaxe",
-                "minecraft:needs_diamond_tool",
-                "minecraft:base_stone_overworld",
-                "realism:deep_ore_replaceables"
+                "minecraft:needs_diamond_tool"
+
         ));
         TAGSFORBLOCK.put("deep_cobblestone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -44,9 +62,7 @@ public class JsonFileGenerator {
         ));
         TAGSFORBLOCK.put("boulder_stone", List.of(
                 "minecraft:mineable/pickaxe",
-                "minecraft:needs_iron_tool",
-                "minecraft:base_stone_overworld",
-                "realism:boulder_ore_replaceables"
+                "minecraft:needs_iron_tool"
         ));
         TAGSFORBLOCK.put("boulder_cobblestone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -56,22 +72,35 @@ public class JsonFileGenerator {
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_stone_tool"
         ));
-        TAGSFORBLOCK.put("cracked_cobblestone", List.of(
+        TAGSFORBLOCK.put("cracked_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_stone_tool"
         ));
-        TAGSFORBLOCK.put("crumbling_cobblestone", List.of(
+        TAGSFORBLOCK.put("crumbling_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_stone_tool"
         ));
-        TAGSFORBLOCK.put("broken_cobblestone", List.of(
+        TAGSFORBLOCK.put("broken_stone", List.of(
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_stone_tool"
         ));
-
 
         BASEBLOCKS.add("deep_diamond_ore");
         BASEBLOCKS.add("boulder_diamond_ore");
+        BASEBLOCKS.add("deep_iron_ore");
+        BASEBLOCKS.add("boulder_iron_ore");
+        BASEBLOCKS.add("deep_gold_ore");
+        BASEBLOCKS.add("boulder_gold_ore");
+        BASEBLOCKS.add("deep_copper_ore");
+        BASEBLOCKS.add("boulder_copper_ore");
+        BASEBLOCKS.add("deep_coal_ore");
+        BASEBLOCKS.add("boulder_coal_ore");
+        BASEBLOCKS.add("deep_emerald_ore");
+        BASEBLOCKS.add("boulder_emerald_ore");
+        BASEBLOCKS.add("deep_lapis_ore");
+        BASEBLOCKS.add("boulder_lapis_ore");
+        BASEBLOCKS.add("deep_redstone_ore");
+        BASEBLOCKS.add("boulder_redstone_ore");
 
         TAGSFORBLOCK.put("deep_diamond_ore", List.of(
                 "minecraft:mineable/pickaxe",
@@ -81,6 +110,61 @@ public class JsonFileGenerator {
                 "minecraft:mineable/pickaxe",
                 "minecraft:needs_iron_tool"
         ));
+        TAGSFORBLOCK.put("deep_iron_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_stone_tool"
+        ));
+        TAGSFORBLOCK.put("boulder_iron_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_stone_tool"
+        ));
+        TAGSFORBLOCK.put("deep_gold_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool"
+        ));
+        TAGSFORBLOCK.put("boulder_gold_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool"
+        ));
+        TAGSFORBLOCK.put("deep_copper_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_stone_tool"
+        ));
+        TAGSFORBLOCK.put("boulder_copper_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_stone_tool"
+        ));
+        TAGSFORBLOCK.put("deep_coal_ore", List.of(
+                "minecraft:mineable/pickaxe"
+        ));
+        TAGSFORBLOCK.put("boulder_coal_ore", List.of(
+                "minecraft:mineable/pickaxe"
+        ));
+        TAGSFORBLOCK.put("deep_emerald_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool"
+        ));
+        TAGSFORBLOCK.put("boulder_emerald_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool"
+        ));
+        TAGSFORBLOCK.put("deep_lapis_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_stone_tool"
+        ));
+        TAGSFORBLOCK.put("boulder_lapis_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_stone_tool"
+        ));
+        TAGSFORBLOCK.put("deep_redstone_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool"
+        ));
+        TAGSFORBLOCK.put("boulder_redstone_ore", List.of(
+                "minecraft:mineable/pickaxe",
+                "minecraft:needs_iron_tool"
+        ));
+
 
         BASEITEMS.add("stone_pebble");
         BASEITEMS.add("deep_stone_pebble");
@@ -94,6 +178,16 @@ public class JsonFileGenerator {
         }
     }
 
+    public static String getVanillaOreLootTable(String customOreName) {
+        String vanilla = customOreName;
+        if (vanilla.startsWith("boulder_")) {
+            vanilla = vanilla.substring("boulder_".length());
+        } else if (vanilla.startsWith("deep_")) {
+            vanilla = vanilla.substring("deep_".length());
+        }
+        return "minecraft:blocks/" + vanilla;
+    }
+
     public static void generateAllJson() {
         BASEITEMS.forEach(name -> {
             generateSimpleItemModelJson(name, "realism:item/" + name);
@@ -101,7 +195,7 @@ public class JsonFileGenerator {
         });
         BASEBLOCKS.forEach(name -> {
             generateBlockJson(name);
-            generateOreLootTableWithPebble(name, "minecraft:blocks/diamond_ore");
+            generateOreLootTableWithPebble(name, getVanillaOreLootTable(name));
         });
         BLOCK_NAMES.forEach((name) -> {
             generateBlockJson(name);
@@ -149,13 +243,46 @@ public class JsonFileGenerator {
                         "      \"entries\": [\n" +
                         "        {\n" +
                         "          \"type\": \"minecraft:loot_table\",\n" +
-                        "          \"value\": \"" + vanillaLootTable + "\"\n" +
+                        "          \"value\": \"" + vanillaLootTable + "\",\n" +
+                        "          \"functions\": [],\n" +
+                        "          \"conditions\": []\n" +
+                        "        }\n" +
+                        "      ],\n" +
+                        "      \"conditions\": [\n" +
+                        "        {\n" +
+                        "          \"condition\": \"minecraft:inverted\",\n" +
+                        "          \"term\": {\n" +
+                        "            \"condition\": \"minecraft:match_tool\",\n" +
+                        "            \"predicate\": {\n" +
+                        "              \"predicates\": {\n" +
+                        "                \"minecraft:enchantments\": [\n" +
+                        "                  { \"enchantments\": \"minecraft:silk_touch\" }\n" +
+                        "                ]\n" +
+                        "              }\n" +
+                        "            }\n" +
+                        "          }\n" +
                         "        }\n" +
                         "      ]\n" +
                         "    },\n" +
                         "    {\n" +
                         "      \"rolls\": 1,\n" +
                         "      \"entries\": [\n" +
+                        "        {\n" +
+                        "          \"type\": \"minecraft:item\",\n" +
+                        "          \"name\": \"realism:" + blockName + "\",\n" +
+                        "          \"conditions\": [\n" +
+                        "            {\n" +
+                        "              \"condition\": \"minecraft:match_tool\",\n" +
+                        "              \"predicate\": {\n" +
+                        "                \"predicates\": {\n" +
+                        "                  \"minecraft:enchantments\": [\n" +
+                        "                    { \"enchantments\": \"minecraft:silk_touch\" }\n" +
+                        "                  ]\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
                         "        {\n" +
                         "          \"type\": \"minecraft:item\",\n" +
                         "          \"name\": \"" + pebble + "\",\n" +
@@ -169,6 +296,21 @@ public class JsonFileGenerator {
                         "              }\n" +
                         "            },\n" +
                         "            { \"function\": \"minecraft:explosion_decay\" }\n" +
+                        "          ],\n" +
+                        "          \"conditions\": [\n" +
+                        "            {\n" +
+                        "              \"condition\": \"minecraft:inverted\",\n" +
+                        "              \"term\": {\n" +
+                        "                \"condition\": \"minecraft:match_tool\",\n" +
+                        "                \"predicate\": {\n" +
+                        "                  \"predicates\": {\n" +
+                        "                    \"minecraft:enchantments\": [\n" +
+                        "                      { \"enchantments\": \"minecraft:silk_touch\" }\n" +
+                        "                    ]\n" +
+                        "                  }\n" +
+                        "                }\n" +
+                        "              }\n" +
+                        "            }\n" +
                         "          ]\n" +
                         "        }\n" +
                         "      ]\n" +
@@ -988,6 +1130,24 @@ public class JsonFileGenerator {
         builder.append("\n}\n");
 
         writeFile(path, filename, builder.toString());
+    }
+
+    public static void generateBlockTag(String tag, List<String> blockNames) {
+        String[] split = tag.split(":", 2);
+        String namespace = split.length == 2 ? split[0] : "minecraft";
+        String tagFile = split.length == 2 ? split[1].replace("block/", "") : tag.replace("block/", "");
+        String tagBasePath = "src/main/resources/data/" + namespace + "/tags/block/";
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("{\n  \"replace\": false,\n  \"values\": [\n");
+        for (int i = 0; i < blockNames.size(); i++) {
+            builder.append("    \"realism:").append(blockNames.get(i)).append("\"");
+            if (i < blockNames.size() - 1) builder.append(",");
+            builder.append("\n");
+        }
+        builder.append("  ]\n}");
+
+        writeFile(tagBasePath, tagFile + ".json", builder.toString());
     }
 
 
