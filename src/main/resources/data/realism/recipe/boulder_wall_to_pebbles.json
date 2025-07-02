@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "realism:boulder_cobblestone_wall"
+  },
+  "pattern": [
+    "#"
+  ],
+  "result": {
+    "count": 8,
+    "id": "realism:boulder_stone_pebble"
+  }
+}

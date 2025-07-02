@@ -13,6 +13,7 @@ public class JsonFileGenerator {
     private static final List<String> BASEITEMS = new ArrayList<>();
     public static List<String> BLOCK_NAMES = new ArrayList<>();
     public static Map<String, List<String>> TAGSFORBLOCK = new HashMap<>();
+    public static Map<String, List<String>> TAGSFORITEM = new HashMap<>();
     public static List<String> BASEBLOCKS = new ArrayList<>();
 
     static {
@@ -25,6 +26,11 @@ public class JsonFileGenerator {
         BLOCK_NAMES.add("crumbling_cobblestone");
         BLOCK_NAMES.add("broken_cobblestone");
 
+        for (String name : BLOCK_NAMES) {
+            if (name.endsWith("_cobblestone")) {
+                TAGSFORITEM.put(name, List.of("minecraft:stone_tool_materials"));
+            }
+        }
 
         TAGSFORBLOCK.put("deep_stone", List.of(
                 "minecraft:mineable/pickaxe",
@@ -103,18 +109,23 @@ public class JsonFileGenerator {
             generateStairsJson(name + "_stairs");
             if (name.matches(".*cobblestone.*")) {
                 generateCobbleLikeLootTableJson(name);
+                generateCobbleLikeLootTableJson(name + "_wall");
                 generateCobbleLikeLootTableJson(name + "_stairs");
             } else {
                 generateStoneLikeLootTableJson(name);
+                generateStoneLikeLootTableJson(name + "_wall");
                 generateStoneLikeLootTableJson(name + "_stairs");
             }
             generateWallModels(name);
             generateSlabLootTableJson(name + "_slab");
         });
         generateMiningLevelTags(TAGSFORBLOCK);
+        generateItemTags(TAGSFORITEM);
         generateWallsBlockTag();
         generateLangFile();
         generateDefaultRecipes();
+        generatePebbleReverseRecipes();
+        generatePebbleForwardRecipes();
         System.out.println("JSON generation complete.");
     }
 
@@ -198,6 +209,33 @@ public class JsonFileGenerator {
                         "  ]\n" +
                         "}";
         writeFile(path, blockName + ".json", content);
+    }
+
+    public static void generateItemTags(Map<String, List<String>> tagsForItem) {
+        Map<String, List<String>> tagToItems = new HashMap<>();
+        for (var entry : tagsForItem.entrySet()) {
+            String item = entry.getKey();
+            for (String tag : entry.getValue()) {
+                // Only add the base item, not slab/stair/wall
+                tagToItems.computeIfAbsent(tag, t -> new ArrayList<>()).add("realism:" + item);
+            }
+        }
+        for (var tagEntry : tagToItems.entrySet()) {
+            String tag = tagEntry.getKey();
+            String[] split = tag.split(":", 2);
+            String namespace = split.length == 2 ? split[0] : "minecraft";
+            String tagFile = split.length == 2 ? split[1].replace("item/", "") : tag.replace("item/", "");
+            String tagBasePath = "src/main/resources/data/" + namespace + "/tags/item/";
+            StringBuilder content = new StringBuilder("{\n  \"replace\": false,\n  \"values\": [\n");
+            List<String> items = tagEntry.getValue();
+            for (int i = 0; i < items.size(); i++) {
+                content.append("    \"").append(items.get(i)).append("\"");
+                if (i < items.size() - 1) content.append(",");
+                content.append("\n");
+            }
+            content.append("  ]\n}");
+            writeFile(tagBasePath, tagFile + ".json", content.toString());
+        }
     }
 
     public static void generateMiningLevelTags(Map<String, List<String>> tagsForBlock) {
@@ -741,12 +779,39 @@ public class JsonFileGenerator {
 
             writeFile(pebbleRecipePath, "boulder_stone_pebble_to_slab.json", boulderPebbleRecipe);
             writeFile(pebbleRecipePath, "deep_stone_pebble_to_slab.json", deepPebbleRecipe);
-            String stonePebbleRecipe =
+
+        }
+    }
+
+    public static void generatePebbleForwardRecipes() {
+        class PebbleForward {
+            String variant, pebble, slab, stair, cobble, wall;
+
+            PebbleForward(String variant) {
+                String prefix = "realism:";
+                this.variant = variant;
+                this.pebble = variant.equals("loose") ? prefix + "stone_pebble" : prefix + variant + "_stone_pebble";
+                this.cobble = variant.equals("loose") ? "loose_cobblestone" : variant + "_cobblestone";
+                this.slab = this.cobble + "_slab";
+                this.stair = variant.equals("loose") ? "loose_cobblestone_stairs" : variant + "_stone_stairs";
+                this.wall = this.cobble + "_wall";
+            }
+        }
+        PebbleForward[] variants = {
+                new PebbleForward("deep"),
+                new PebbleForward("boulder"),
+                new PebbleForward("loose")
+        };
+        String path = "src/main/resources/data/realism/recipe/";
+
+        for (PebbleForward info : variants) {
+            // 4 pebbles -> slab
+            String toSlab =
                     "{\n" +
                             "  \"type\": \"minecraft:crafting_shaped\",\n" +
                             "  \"category\": \"building\",\n" +
                             "  \"key\": {\n" +
-                            "    \"#\": \"realism:stone_pebble\"\n" +
+                            "    \"#\": \"" + info.pebble + "\"\n" +
                             "  },\n" +
                             "  \"pattern\": [\n" +
                             "    \"##\",\n" +
@@ -754,115 +819,148 @@ public class JsonFileGenerator {
                             "  ],\n" +
                             "  \"result\": {\n" +
                             "    \"count\": 1,\n" +
-                            "    \"id\": \"realism:loose_cobblestone_slab\"\n" +
+                            "    \"id\": \"realism:" + info.slab + "\"\n" +
                             "  }\n" +
                             "}";
+            writeFile(path, info.variant + "_pebble_to_slab.json", toSlab);
 
-            writeFile(pebbleRecipePath, "stone_pebble_to_slab.json", stonePebbleRecipe);
-            String deepStonePebbleBack =
+            // 6 pebbles -> wall
+            String toWall =
                     "{\n" +
                             "  \"type\": \"minecraft:crafting_shaped\",\n" +
                             "  \"category\": \"building\",\n" +
                             "  \"key\": {\n" +
-                            "    \"#\": \"realism:deep_cobblestone_slab\"\n" +
+                            "    \"#\": \"" + info.pebble + "\"\n" +
                             "  },\n" +
                             "  \"pattern\": [\n" +
-                            "    \"#\"\n" +
+                            "    \"###\",\n" +
+                            "    \"###\"\n" +
                             "  ],\n" +
                             "  \"result\": {\n" +
-                            "    \"count\": 4,\n" +
-                            "    \"id\": \"realism:deep_stone_pebble\"\n" +
+                            "    \"count\": 1,\n" +
+                            "    \"id\": \"realism:" + info.wall + "\"\n" +
                             "  }\n" +
                             "}";
-
-            String boulderStonePebbleBack =
-                    "{\n" +
-                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
-                            "  \"category\": \"building\",\n" +
-                            "  \"key\": {\n" +
-                            "    \"#\": \"realism:boulder_cobblestone_slab\"\n" +
-                            "  },\n" +
-                            "  \"pattern\": [\n" +
-                            "    \"#\"\n" +
-                            "  ],\n" +
-                            "  \"result\": {\n" +
-                            "    \"count\": 4,\n" +
-                            "    \"id\": \"realism:boulder_stone_pebble\"\n" +
-                            "  }\n" +
-                            "}";
-
-            String stonePebbleBack =
-                    "{\n" +
-                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
-                            "  \"category\": \"building\",\n" +
-                            "  \"key\": {\n" +
-                            "    \"#\": \"realism:loose_cobblestone_slab\"\n" +
-                            "  },\n" +
-                            "  \"pattern\": [\n" +
-                            "    \"#\"\n" +
-                            "  ],\n" +
-                            "  \"result\": {\n" +
-                            "    \"count\": 4,\n" +
-                            "    \"id\": \"realism:stone_pebble\"\n" +
-                            "  }\n" +
-                            "}";
-
-            writeFile(pebbleRecipePath, "deep_stone_slab_to_pebbles.json", deepStonePebbleBack);
-            writeFile(pebbleRecipePath, "boulder_stone_slab_to_pebbles.json", boulderStonePebbleBack);
-            writeFile(pebbleRecipePath, "loose_cobblestone_slab_to_pebbles.json", stonePebbleBack);
-            String deepCobblestoneToPebbles =
-                    "{\n" +
-                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
-                            "  \"category\": \"building\",\n" +
-                            "  \"key\": {\n" +
-                            "    \"#\": \"realism:deep_cobblestone\"\n" +
-                            "  },\n" +
-                            "  \"pattern\": [\n" +
-                            "    \"#\"\n" +
-                            "  ],\n" +
-                            "  \"result\": {\n" +
-                            "    \"count\": 8,\n" +
-                            "    \"id\": \"realism:deep_stone_pebble\"\n" +
-                            "  }\n" +
-                            "}";
-
-            String boulderCobblestoneToPebbles =
-                    "{\n" +
-                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
-                            "  \"category\": \"building\",\n" +
-                            "  \"key\": {\n" +
-                            "    \"#\": \"realism:boulder_cobblestone\"\n" +
-                            "  },\n" +
-                            "  \"pattern\": [\n" +
-                            "    \"#\"\n" +
-                            "  ],\n" +
-                            "  \"result\": {\n" +
-                            "    \"count\": 8,\n" +
-                            "    \"id\": \"realism:boulder_stone_pebble\"\n" +
-                            "  }\n" +
-                            "}";
-
-            String looseCobblestoneToPebbles =
-                    "{\n" +
-                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
-                            "  \"category\": \"building\",\n" +
-                            "  \"key\": {\n" +
-                            "    \"#\": \"realism:loose_cobblestone\"\n" +
-                            "  },\n" +
-                            "  \"pattern\": [\n" +
-                            "    \"#\"\n" +
-                            "  ],\n" +
-                            "  \"result\": {\n" +
-                            "    \"count\": 8,\n" +
-                            "    \"id\": \"realism:stone_pebble\"\n" +
-                            "  }\n" +
-                            "}";
-
-            writeFile(path, "deep_cobblestone_to_pebbles.json", deepCobblestoneToPebbles);
-            writeFile(path, "boulder_cobblestone_to_pebbles.json", boulderCobblestoneToPebbles);
-            writeFile(path, "loose_cobblestone_to_pebbles.json", looseCobblestoneToPebbles);
-
+            writeFile(path, info.variant + "_pebble_to_wall.json", toWall);
         }
+    }
+
+    public static void generatePebbleReverseRecipes() {
+        class PebbleReverse {
+            String variant, pebble, slab, stair, cobble, wall;
+
+            PebbleReverse(String variant) {
+                String prefix = "realism:";
+                this.variant = variant;
+                this.pebble = variant.equals("loose") ? prefix + "stone_pebble" : prefix + variant + "_stone_pebble";
+                this.cobble = variant.equals("loose") ? "loose_cobblestone" : variant + "_cobblestone";
+                this.slab = this.cobble + "_slab";
+                this.stair = this.cobble + "_stairs"; // NOTE: use cobble, not stone!
+                this.wall = this.cobble + "_wall";
+            }
+        }
+        PebbleReverse[] variants = {
+                new PebbleReverse("deep"),
+                new PebbleReverse("boulder"),
+                new PebbleReverse("loose")
+        };
+        String path = "src/main/resources/data/realism/recipe/";
+
+        for (PebbleReverse info : variants) {
+            // Slab -> 4 pebbles
+            String slabToPebble =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:" + info.slab + "\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 4,\n" +
+                            "    \"id\": \"" + info.pebble + "\"\n" +
+                            "  }\n" +
+                            "}";
+
+            // Stairs -> 12 pebbles
+            String stairToPebble =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:" + info.stair + "\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 12,\n" +
+                            "    \"id\": \"" + info.pebble + "\"\n" +
+                            "  }\n" +
+                            "}";
+
+            // Wall -> 8 pebbles
+            String wallToPebble =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:" + info.wall + "\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 8,\n" +
+                            "    \"id\": \"" + info.pebble + "\"\n" +
+                            "  }\n" +
+                            "}";
+
+            // Write files
+            writeFile(path, info.variant + "_slab_to_pebbles.json", slabToPebble);
+            writeFile(path, info.variant + "_stair_to_pebbles.json", stairToPebble);
+            writeFile(path, info.variant + "_wall_to_pebbles.json", wallToPebble);
+
+            // Cobble -> 8 pebbles
+            String cobbleToPebble =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:" + info.cobble + "\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 8,\n" +
+                            "    \"id\": \"" + info.pebble + "\"\n" +
+                            "  }\n" +
+                            "}";
+            writeFile(path, info.variant + "_cobble_to_pebbles.json", cobbleToPebble);
+
+            // 2 slabs -> cobbled block
+            String slabsToCobble =
+                    "{\n" +
+                            "  \"type\": \"minecraft:crafting_shaped\",\n" +
+                            "  \"category\": \"building\",\n" +
+                            "  \"key\": {\n" +
+                            "    \"#\": \"realism:" + info.slab + "\"\n" +
+                            "  },\n" +
+                            "  \"pattern\": [\n" +
+                            "    \"#\",\n" +
+                            "    \"#\"\n" +
+                            "  ],\n" +
+                            "  \"result\": {\n" +
+                            "    \"count\": 1,\n" +
+                            "    \"id\": \"realism:" + info.cobble + "\"\n" +
+                            "  }\n" +
+                            "}";
+            writeFile(path, info.variant + "_slab_to_cobble.json", slabsToCobble);
+        }
+
     }
 
     public static void generateLangFile() {

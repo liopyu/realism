@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "realism:deep_cobblestone_stairs"
+  },
+  "pattern": [
+    "#"
+  ],
+  "result": {
+    "count": 12,
+    "id": "realism:deep_stone_pebble"
+  }
+}

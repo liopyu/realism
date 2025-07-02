@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "realism:loose_cobblestone",
+    "realism:deep_cobblestone",
+    "realism:broken_cobblestone",
+    "realism:boulder_cobblestone",
+    "realism:crumbling_cobblestone",
+    "realism:cracked_cobblestone"
+  ]
+}

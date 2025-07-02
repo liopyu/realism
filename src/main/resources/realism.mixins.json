@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "realism.refmap.json",
   "mixins": [
+    "FallingBlockMixin"
   ],
   "client": [
   ],

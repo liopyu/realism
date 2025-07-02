@@ -1,7 +1,9 @@
 package net.liopyu.realism.util;
 
 import net.liopyu.realism.Realism;
+import net.liopyu.realism.block.BaseFallingSlab;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +20,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.entity.schedule.Schedule;
@@ -30,7 +33,10 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -38,6 +44,7 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerTy
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 import net.minecraft.world.level.material.Fluid;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -61,9 +68,11 @@ public class RealismHelperClass {
             errorMessagesLogged.add(errorMessage);
         }
     }
+
     public static Block getRealismBlock(String name) {
-        return BuiltInRegistries.BLOCK.getValue(ResourceLocation.fromNamespaceAndPath(Realism.MODID,name));
+        return BuiltInRegistries.BLOCK.getValue(ResourceLocation.fromNamespaceAndPath(Realism.MODID, name));
     }
+
     public static void logWarningMessageOnce(String errorMessage) {
         if (!warningMessagesLogged.contains(errorMessage)) {
             Realism.LOGGER.warn(errorMessage);
@@ -109,7 +118,7 @@ public class RealismHelperClass {
             return BuiltInRegistries.BLOCK.getKey(block);
         } else if (input instanceof EntityType<?> entityType) {
             return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
-        }  else if (input instanceof Fluid fluid) {
+        } else if (input instanceof Fluid fluid) {
             return BuiltInRegistries.FLUID.getKey(fluid);
         } else if (input instanceof MobEffect mobEffect) {
             return BuiltInRegistries.MOB_EFFECT.getKey(mobEffect);
@@ -117,7 +126,7 @@ public class RealismHelperClass {
             return BuiltInRegistries.SOUND_EVENT.getKey(soundEvent);
         } else if (input instanceof Potion potion) {
             return BuiltInRegistries.POTION.getKey(potion);
-        }  else if (input instanceof BlockEntityType<?> blockEntityType) {
+        } else if (input instanceof BlockEntityType<?> blockEntityType) {
             return BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(blockEntityType);
         } else if (input instanceof ParticleType<?> particleType) {
             return BuiltInRegistries.PARTICLE_TYPE.getKey(particleType);
@@ -259,4 +268,24 @@ public class RealismHelperClass {
     public static void removeAllGoals(Predicate<Goal> p_262575_, GoalSelector goalSelector) {
         goalSelector.getAvailableGoals().removeIf((p_262564_) -> p_262575_.test(p_262564_.getGoal()));
     }
+
+    public static void mergeFunction(CallbackInfo ci, FallingBlockEntity self) {
+        BlockPos pos = self.blockPosition();
+        BlockPos below = pos.below();
+        BlockState blockState = self.getBlockState();
+        BlockState belowState = self.level().getBlockState(below);
+
+        double threshold = 0.3;
+        if (blockState.getBlock() instanceof BaseFallingSlab && belowState.getBlock() == blockState.getBlock()) {
+            if (belowState.hasProperty(SlabBlock.TYPE) && belowState.getValue(SlabBlock.TYPE) == SlabType.BOTTOM) {
+                double dy = self.getY() - (below.getY() + 1);
+                if (dy > -threshold && dy < threshold) {
+                    BaseFallingSlab fallingSlab = (BaseFallingSlab) blockState.getBlock();
+                    self.level().setBlockAndUpdate(below, fallingSlab.cobblestoneBlock.defaultBlockState());
+                    self.discard();
+                }
+            }
+        }
+    }
+
 }
