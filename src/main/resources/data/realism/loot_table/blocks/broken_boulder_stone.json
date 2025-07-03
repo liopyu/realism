@@ -48,7 +48,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "realism:stone_pebble",
+          "name": "realism:boulder_stone_pebble",
           "functions": [
             {
               "function": "minecraft:set_count",

@@ -1,0 +1,66 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [{
+  "condition": "minecraft:match_tool",
+  "predicate": {
+    "predicates": {
+      "minecraft:enchantments": [
+        { "enchantments": "minecraft:silk_touch" }
+      ]
+    }
+  }
+}],
+              "name": "realism:stone"
+            },
+            {
+              "type": "minecraft:item",
+              "name": "realism:cobblestone"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "realism:stone_pebble",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 4,
+                "max": 6
+              }
+            },
+            { "function": "minecraft:explosion_decay" }
+          ],
+          "conditions": [{
+  "condition": "minecraft:inverted",
+  "term": {
+  "condition": "minecraft:match_tool",
+  "predicate": {
+    "predicates": {
+      "minecraft:enchantments": [
+        { "enchantments": "minecraft:silk_touch" }
+      ]
+    }
+  }
+}
+}]
+        }
+      ]
+    }
+  ]
+}

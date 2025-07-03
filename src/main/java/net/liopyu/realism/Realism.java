@@ -101,6 +101,7 @@ public class Realism {
                 cobbleEntry("broken_boulder_stone", 0.5F, 5F, true, false, false),
                 cobbleEntry("crumbling_boulder_stone", 0.25F, 4F, true, false, false),
 
+                cobbleEntry("stone", 1.5F, 5F, true, false, true),
                 cobbleEntry("loose_cobblestone", 1F, 5F, false, true, true),
                 cobbleEntry("cracked_stone", 0.5F, 4F, true, false, false),
                 cobbleEntry("broken_stone", 0.25F, 2F, true, false, false),

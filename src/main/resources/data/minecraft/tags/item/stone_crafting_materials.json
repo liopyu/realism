@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "realism:loose_cobblestone",
+    "realism:deep_cobblestone",
+    "realism:boulder_cobblestone"
+  ]
+}

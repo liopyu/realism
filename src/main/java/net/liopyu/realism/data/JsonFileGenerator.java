@@ -17,6 +17,7 @@ public class JsonFileGenerator {
     public static List<String> BASEBLOCKS = new ArrayList<>();
 
     static {
+        BLOCK_NAMES.add("stone");
         BLOCK_NAMES.add("deep_stone");
         BLOCK_NAMES.add("deep_cobblestone");
         BLOCK_NAMES.add("boulder_stone");
@@ -33,6 +34,7 @@ public class JsonFileGenerator {
                 "crumbling_boulder_stone",
                 "broken_boulder_stone",
 
+                "stone",
                 "cracked_stone",
                 "crumbling_stone",
                 "broken_stone"
@@ -47,13 +49,19 @@ public class JsonFileGenerator {
                         "boulder_stone"
                 ));
         generateBlockTag(
+                "minecraft:stone_ore_replaceables", List.of(
+                        "stone"
+                ));
+        generateBlockTag(
                 "minecraft:base_stone_overworld", List.of(
                         "boulder_stone",
-                        "deep_stone"
+                        "deep_stone",
+                        "stone"
                 ));
         for (String name : BLOCK_NAMES) {
             if (name.endsWith("_cobblestone")) {
                 TAGSFORITEM.put(name, List.of("minecraft:stone_tool_materials"));
+                TAGSFORITEM.put(name, List.of("minecraft:stone_crafting_materials"));
             }
         }
 
@@ -71,6 +79,10 @@ public class JsonFileGenerator {
         ));
         TAGSFORBLOCK.put("boulder_cobblestone", List.of(
                 "minecraft:mineable/pickaxe"
+        ));
+        TAGSFORBLOCK.put("stone", List.of(
+                "minecraft:mineable/pickaxe"
+
         ));
         TAGSFORBLOCK.put("loose_cobblestone", List.of(
                 "minecraft:mineable/pickaxe"
@@ -271,9 +283,9 @@ public class JsonFileGenerator {
     public static void generateOreLootTableWithPebble(String blockName, String vanillaLootTable) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
         String pebble;
-        if (blockName.startsWith("deep_")) {
+        if (blockName.startsWith("deep_") || blockName.contains("_deep_")) {
             pebble = "realism:deep_stone_pebble";
-        } else if (blockName.startsWith("boulder_")) {
+        } else if (blockName.startsWith("boulder_") || blockName.contains("_boulder_")) {
             pebble = "realism:boulder_stone_pebble";
         } else {
             pebble = "realism:stone_pebble";

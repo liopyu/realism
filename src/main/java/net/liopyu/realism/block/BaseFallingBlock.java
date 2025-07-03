@@ -26,6 +26,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import org.jline.utils.Log;
+
+import java.util.Objects;
 
 import static net.liopyu.realism.Realism.MODID;
 
@@ -69,8 +72,39 @@ public class BaseFallingBlock extends Block implements Fallable {
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        if (level.isClientSide() || isMoving) return;
+
+        ResourceLocation placedId = BuiltInRegistries.BLOCK.getKey(this);
+        if (placedId == null) return;
+        String placedPath = placedId.getPath();
+
+        if (!placedPath.endsWith("cobblestone")) {
+            level.scheduleTick(pos, this, this.getDelayAfterPlace());
+            return;
+        }
+
+        BlockPos below = pos.below();
+        BlockState belowState = level.getBlockState(below);
+        ResourceLocation slabId = BuiltInRegistries.BLOCK.getKey(belowState.getBlock());
+        if (slabId == null) {
+            level.scheduleTick(pos, this, this.getDelayAfterPlace());
+            return;
+        }
+        
+        String expectedSlab = placedPath + "_slab";
+        if (slabId.getPath().equals(expectedSlab)) {
+            Block slabBlock = belowState.getBlock();
+            level.setBlock(below, this.defaultBlockState(), 3);
+            level.setBlock(pos, slabBlock.defaultBlockState(), 3);
+
+            LogUtils.getLogger().info("BLOCK STACK: Success. Promoted {} at {} to full block and set slab at {}", expectedSlab, below, pos);
+
+            return;
+        }
+
         level.scheduleTick(pos, this, this.getDelayAfterPlace());
     }
+
 
     @Override
     protected BlockState updateShape(
@@ -123,41 +157,31 @@ public class BaseFallingBlock extends Block implements Fallable {
     }
 
     protected void falling(FallingBlockEntity entity) {
-        if (!isCobbled) {
-            ResourceLocation id = BuiltInRegistries.BLOCK.getKey(this);
-            if (id == null) return;
+        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(this);
+        if (id == null) return;
 
+        if (!isCobbled) {
             String cobbledName = id.getPath().replace("_stone", "_cobblestone");
             ResourceLocation cobbledId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), cobbledName);
             var ref = BuiltInRegistries.BLOCK.get(cobbledId);
-
-            if (ref.isPresent()) {
+            if (id.getNamespace().equals("realism") && id.getPath().equals("stone")) {
+                ResourceLocation looseId = ResourceLocation.fromNamespaceAndPath("realism", "loose_cobblestone");
+                var looseRef = BuiltInRegistries.BLOCK.get(looseId);
+                if (looseRef.isPresent()) {
+                    Block loosed = looseRef.get().value();
+                    if (entity instanceof FallingBlockAccess access) {
+                        access.setBlockstate(loosed.defaultBlockState().setValue(PLACED, false));
+                    }
+                }
+            } else if (ref.isPresent()) {
                 Block cobbled = ref.get().value();
                 if (entity instanceof FallingBlockAccess access) {
                     access.setBlockstate(cobbled.defaultBlockState().setValue(PLACED, false));
                 }
             }
+
         }
     }
-
-    /*protected void falling(FallingBlockEntity entity) {
-        if (!isCobbled) {
-            String cobbledName = this.registryName.replace("_stone", "_cobblestone");
-            ResourceLocation cobbledId = ResourceLocation.fromNamespaceAndPath(MODID, cobbledName);
-            Block cobbledBlock = BuiltInRegistries.BLOCK.get(cobbledId).get().value();
-
-            if (cobbledBlock != null && cobbledBlock != this) {
-                BlockState cobbledState = cobbledBlock.defaultBlockState().setValue(PLACED, false);
-                FallingBlockEntity newEntity = new FallingBlockEntity(entity.level(),
-                        entity.getX(), entity.getY(), entity.getZ(),
-                        cobbledState);
-                newEntity.setDeltaMovement(entity.getDeltaMovement());
-                newEntity.time = entity.time;
-                entity.level().addFreshEntity(newEntity);
-                entity.discard();
-            }
-        }
-    }*/
 
 
     protected int getDelayAfterPlace() {
@@ -169,20 +193,15 @@ public class BaseFallingBlock extends Block implements Fallable {
         BlockPos below = pos.below();
         BlockState belowState = level.getBlockState(below);
 
-        // Merge if landing on cobbled slab
         if (belowState.getBlock() == cobbledSlab) {
-            // Replace below with full block (this)
             level.setBlockAndUpdate(below, this.defaultBlockState());
-            // Place a cobbled slab above, in the "bottom" position
             BlockPos above = below.above();
             BlockState slabState = cobbledSlab.defaultBlockState();
             if (slabState.hasProperty(SlabBlock.TYPE))
                 slabState = slabState.setValue(SlabBlock.TYPE, net.minecraft.world.level.block.state.properties.SlabType.BOTTOM);
             level.setBlockAndUpdate(above, slabState);
-            // Remove the falling block entity, don't place itself at landing pos
             level.removeBlock(pos, false);
         } else {
-            // Place as normal falling block if not merging
             level.setBlockAndUpdate(pos, fallingState);
         }
     }

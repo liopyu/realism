@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "realism:stone_wall",
     "realism:deep_stone_wall",
     "realism:deep_cobblestone_wall",
     "realism:boulder_stone_wall",
