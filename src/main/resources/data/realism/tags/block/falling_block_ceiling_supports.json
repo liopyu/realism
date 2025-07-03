@@ -2,7 +2,13 @@
   "replace": false,
   "values": [
     "realism:deep_stone",
+    "realism:cracked_deep_stone",
+    "realism:crumbling_deep_stone",
+    "realism:broken_deep_stone",
     "realism:boulder_stone",
+    "realism:cracked_boulder_stone",
+    "realism:crumbling_boulder_stone",
+    "realism:broken_boulder_stone",
     "realism:cracked_stone",
     "realism:crumbling_stone",
     "realism:broken_stone"

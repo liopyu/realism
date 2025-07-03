@@ -6,13 +6,46 @@
       "entries": [
         {
           "type": "minecraft:loot_table",
-          "value": "minecraft:blocks/redstone_ore"
+          "value": "minecraft:blocks/redstone_ore",
+          "functions": [],
+          "conditions": []
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "predicates": {
+                "minecraft:enchantments": [
+                  { "enchantments": "minecraft:silk_touch" }
+                ]
+              }
+            }
+          }
         }
       ]
     },
     {
       "rolls": 1,
       "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "realism:deep_redstone_ore",
+          "conditions": [
+            {
+              "condition": "minecraft:match_tool",
+              "predicate": {
+                "predicates": {
+                  "minecraft:enchantments": [
+                    { "enchantments": "minecraft:silk_touch" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
         {
           "type": "minecraft:item",
           "name": "realism:deep_stone_pebble",
@@ -26,6 +59,21 @@
               }
             },
             { "function": "minecraft:explosion_decay" }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:inverted",
+              "term": {
+                "condition": "minecraft:match_tool",
+                "predicate": {
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      { "enchantments": "minecraft:silk_touch" }
+                    ]
+                  }
+                }
+              }
+            }
           ]
         }
       ]

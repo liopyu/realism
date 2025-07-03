@@ -2,6 +2,7 @@ package net.liopyu.realism;
 
 import com.mojang.logging.LogUtils;
 import net.liopyu.realism.block.BaseFallingBlock;
+import net.liopyu.realism.events.server.ServerEvents;
 import net.liopyu.realism.util.RegistryUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
@@ -32,7 +34,7 @@ public class Realism {
     public static final Logger LOGGER = LogUtils.getLogger();
 
 
-    private static RegistryUtils.BlockEntry cobbleEntry(String name, float strength, float resistance, boolean requiresTool, boolean isFalling) {
+    private static RegistryUtils.BlockEntry cobbleEntry(String name, float strength, float resistance, boolean requiresTool, boolean isFalling, boolean createVariants) {
         return new RegistryUtils.BlockEntry(
                 name,
                 rl -> {
@@ -56,7 +58,7 @@ public class Realism {
                         return block;
                     }
                 },
-                null
+                null, createVariants
         );
     }
 
@@ -72,12 +74,13 @@ public class Realism {
                                 .requiresCorrectToolForDrops()
                                 .strength(strength, resistance)
                 ),
-                null
+                null, false
         );
     }
 
 
     public Realism(IEventBus bus) {
+        NeoForge.EVENT_BUS.register(ServerEvents.class);
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TABS.register(bus);
@@ -86,15 +89,24 @@ public class Realism {
         RegistryUtils.registerItemsOnly(ITEMS, itemNames);
 
         List<RegistryUtils.BlockEntry> entries = List.of(
-                cobbleEntry("deep_stone", 5F, 10F, true, false),
-                cobbleEntry("deep_cobblestone", 4F, 9F, false, true),
-                cobbleEntry("boulder_stone", 3F, 7F, true, false),
-                cobbleEntry("boulder_cobblestone", 2F, 6F, false, true),
-                cobbleEntry("loose_cobblestone", 1F, 5F, false, true),
-                cobbleEntry("cracked_stone", 1.5F, 6F, true, false),
-                cobbleEntry("crumbling_stone", 1.5F, 6F, true, false),
-                cobbleEntry("broken_stone", 1.5F, 6F, true, false)
+                cobbleEntry("deep_stone", 5F, 10F, true, false, true),
+                cobbleEntry("deep_cobblestone", 4F, 9F, false, true, true),
+                cobbleEntry("cracked_deep_stone", 2F, 7F, true, false, false),
+                cobbleEntry("broken_deep_stone", 1F, 6F, true, false, false),
+                cobbleEntry("crumbling_deep_stone", 0.5F, 5F, true, false, false),
+
+                cobbleEntry("boulder_stone", 3F, 7F, true, false, true),
+                cobbleEntry("boulder_cobblestone", 2F, 6F, false, true, true),
+                cobbleEntry("cracked_boulder_stone", 1F, 6F, true, false, false),
+                cobbleEntry("broken_boulder_stone", 0.5F, 5F, true, false, false),
+                cobbleEntry("crumbling_boulder_stone", 0.25F, 4F, true, false, false),
+
+                cobbleEntry("loose_cobblestone", 1F, 5F, false, true, true),
+                cobbleEntry("cracked_stone", 0.5F, 4F, true, false, false),
+                cobbleEntry("broken_stone", 0.25F, 2F, true, false, false),
+                cobbleEntry("crumbling_stone", 0.125F, 3F, true, false, false)
         );
+
         List<RegistryUtils.BlockEntry> oreEntries = List.of(
                 oreEntry("deep_diamond_ore", 5F, 10F, 3, 7),
                 oreEntry("boulder_diamond_ore", 3F, 7F, 3, 7),
@@ -126,9 +138,12 @@ public class Realism {
                         .displayItems((params, output) -> {
                             for (var entry : entries) {
                                 output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name())).get().value());
-                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_slab")).get().value());
-                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_stairs")).get().value());
-                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_wall")).get().value());
+                                if (entry.createVariants()) {
+                                    output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_slab")).get().value());
+                                    output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_stairs")).get().value());
+                                    output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_wall")).get().value());
+                                }
+
                             }
                             for (var entry : oreEntries) {
                                 output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name())).get().value());

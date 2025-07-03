@@ -2,46 +2,35 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "bonus_rolls": 0.0,
+      "rolls": 1.0,
       "entries": [
         {
           "type": "minecraft:alternatives",
           "children": [
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:match_tool",
-                  "predicate": {
-                    "predicates": {
-                      "minecraft:enchantments": [
-                        {
-                          "enchantments": "minecraft:silk_touch",
-                          "levels": { "min": 1 }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
+              "conditions": [{
+  "condition": "minecraft:match_tool",
+  "predicate": {
+    "predicates": {
+      "minecraft:enchantments": [
+        { "enchantments": "minecraft:silk_touch" }
+      ]
+    }
+  }
+}],
               "name": "realism:boulder_stone"
             },
             {
               "type": "minecraft:item",
-              "conditions": [
-                {
-                  "condition": "minecraft:survives_explosion"
-                }
-              ],
               "name": "realism:boulder_cobblestone"
             }
           ]
         }
-      ],
-      "rolls": 1.0
+      ]
     },
     {
-      "bonus_rolls": 0.0,
+      "rolls": 1.0,
       "entries": [
         {
           "type": "minecraft:item",
@@ -55,14 +44,23 @@
                 "max": 6
               }
             },
-            {
-              "function": "minecraft:explosion_decay"
-            }
-          ]
-        }
-      ],
-      "rolls": 1.0
+            { "function": "minecraft:explosion_decay" }
+          ],
+          "conditions": [{
+  "condition": "minecraft:inverted",
+  "term": {
+  "condition": "minecraft:match_tool",
+  "predicate": {
+    "predicates": {
+      "minecraft:enchantments": [
+        { "enchantments": "minecraft:silk_touch" }
+      ]
     }
-  ],
-  "random_sequence": "realism:blocks/boulder_stone"
+  }
+}
+}]
+        }
+      ]
+    }
+  ]
 }

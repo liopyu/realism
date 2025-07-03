@@ -19,9 +19,7 @@
             "predicate": {
               "predicates": {
                 "minecraft:enchantments": [
-                  {
-                    "enchantments": "minecraft:silk_touch"
-                  }
+                  { "enchantments": "minecraft:silk_touch" }
                 ]
               }
             }
@@ -41,9 +39,7 @@
               "predicate": {
                 "predicates": {
                   "minecraft:enchantments": [
-                    {
-                      "enchantments": "minecraft:silk_touch"
-                    }
+                    { "enchantments": "minecraft:silk_touch" }
                   ]
                 }
               }
@@ -62,9 +58,7 @@
                 "max": 6
               }
             },
-            {
-              "function": "minecraft:explosion_decay"
-            }
+            { "function": "minecraft:explosion_decay" }
           ],
           "conditions": [
             {
@@ -74,9 +68,7 @@
                 "predicate": {
                   "predicates": {
                     "minecraft:enchantments": [
-                      {
-                        "enchantments": "minecraft:silk_touch"
-                      }
+                      { "enchantments": "minecraft:silk_touch" }
                     ]
                   }
                 }
