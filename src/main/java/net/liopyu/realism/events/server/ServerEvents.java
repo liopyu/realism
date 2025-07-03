@@ -1,28 +1,37 @@
 package net.liopyu.realism.events.server;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @EventBusSubscriber
 public class ServerEvents {
+    @SubscribeEvent
+    public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
+        Player player = event.getEntity();
+        BlockState state = event.getState();
+        float speed = event.getNewSpeed();
+
+        var blockKey = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+        if (blockKey != null && blockKey.getNamespace().equals("realism")) {
+            if (!player.getMainHandItem().isCorrectToolForDrops(state)) {
+                event.setNewSpeed(speed * 0.5f);
+            } else {
+                event.setNewSpeed(speed * 1.3f);
+            }
+        }
+    }
+
+
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (event.getPlayer().isCreative()) return;
@@ -33,9 +42,9 @@ public class ServerEvents {
         );
 
         Map<String, float[]> SPEED_THRESHOLDS = Map.of(
-                "minecraft:stone", new float[]{4f, 5f, 6f},
-                "realism:boulder_stone", new float[]{26f, 54f, 58f},
-                "realism:deep_stone", new float[]{60f, 70f, 80f}
+                "minecraft:stone", new float[]{3f, 5f, 6f},
+                "realism:boulder_stone", new float[]{5f, 5f, 6f},
+                "realism:deep_stone", new float[]{8f, 8f, 9f}
         );
 
         BlockState state = event.getState();
@@ -46,10 +55,10 @@ public class ServerEvents {
         String key = id.toString();
 
         if (CHAINS.containsKey(key)) {
-            float speed = getActualBreakSpeed(event.getPlayer(), state, event.getPlayer().getMainHandItem());
+            float speed = event.getPlayer().getMainHandItem().getDestroySpeed(state);
             float[] thresholds = SPEED_THRESHOLDS.getOrDefault(key, new float[]{});
             String[] chain = CHAINS.get(key);
-
+            //LogUtils.getLogger().info("Speed: " + speed + " | Block: " + key);
             int stage = 0;
             while (stage < thresholds.length && speed >= thresholds[stage]) {
                 stage++;
@@ -65,7 +74,6 @@ public class ServerEvents {
             return;
         }
 
-        // Not a base block, check if it's a cracked/broken/etc variant
         for (var e : CHAINS.entrySet()) {
             String[] chain = e.getValue();
             for (int i = 0; i < chain.length - 1; i++) {
@@ -84,46 +92,4 @@ public class ServerEvents {
     }
 
 
-    private static int getEnchantmentLevel(ResourceKey<Enchantment> key, ItemStack tool, Level level) {
-        var reg = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-        var ench = reg.get(key);
-        if (ench.isEmpty()) return 0;
-        return ench.map(enchantmentReference -> net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(enchantmentReference, tool)).orElse(0);
-    }
-
-    private static float getActualBreakSpeed(Player player, BlockState state, ItemStack tool) {
-        float speed = player.getDestroySpeed(state);
-
-        int efficiency = getEnchantmentLevel(Enchantments.EFFICIENCY, tool, player.level());
-
-        if (efficiency > 0 && speed > 1.0F) {
-            speed += efficiency * efficiency + 1;
-        }
-        if (player.hasEffect(MobEffects.HASTE)) {
-            int amp = player.getEffect(MobEffects.HASTE).getAmplifier();
-            speed *= 1.0F + (amp + 1) * 0.2F;
-        }
-        if (player.hasEffect(MobEffects.MINING_FATIGUE)) {
-            int amp = player.getEffect(MobEffects.MINING_FATIGUE).getAmplifier();
-            float factor = switch (amp) {
-                case 0 -> 0.3F;
-                case 1 -> 0.09F;
-                case 2 -> 0.0027F;
-                default -> 0.00081F;
-            };
-            speed *= factor;
-        }
-        return speed;
-    }
-
-    private static int getStageIndex(String key, String[] chain, Map<String, String[]> chains) {
-        for (Map.Entry<String, String[]> e : chains.entrySet()) {
-            String[] arr = e.getValue();
-            for (int i = 0; i < arr.length; i++) {
-                if (arr[i].equals(key)) return i + 1;
-            }
-            if (e.getKey().equals(key)) return 0;
-        }
-        return -1;
-    }
 }
