@@ -34,7 +34,7 @@ public class Realism {
     public static final Logger LOGGER = LogUtils.getLogger();
 
 
-    private static RegistryUtils.BlockEntry cobbleEntry(String name, float strength, float resistance, boolean requiresTool, boolean isFalling, boolean createVariants) {
+    private static RegistryUtils.BlockEntry cobbleEntry(String name, float strength, float resistance, boolean requiresTool, boolean isFalling, boolean createVariants, boolean noOcclusion) {
         return new RegistryUtils.BlockEntry(
                 name,
                 rl -> {
@@ -42,8 +42,11 @@ public class Realism {
                             .setId(ResourceKey.create(Registries.BLOCK, rl))
                             .mapColor(MapColor.STONE)
                             .instrument(NoteBlockInstrument.BASEDRUM)
-                            .strength(strength, resistance);
 
+                            .strength(strength, resistance);
+                    if (noOcclusion) {
+                        props = props.noOcclusion();
+                    }
                     if (requiresTool) {
                         props = props.requiresCorrectToolForDrops();
                     }
@@ -89,23 +92,23 @@ public class Realism {
         RegistryUtils.registerItemsOnly(ITEMS, itemNames);
 
         List<RegistryUtils.BlockEntry> entries = List.of(
-                cobbleEntry("deep_stone", 5F, 10F, true, false, true),
-                cobbleEntry("deep_cobblestone", 4F, 9F, false, true, true),
-                cobbleEntry("cracked_deep_stone", 2F, 7F, true, false, false),
-                cobbleEntry("broken_deep_stone", 1F, 6F, true, false, false),
-                cobbleEntry("crumbling_deep_stone", 0.5F, 5F, true, false, false),
+                cobbleEntry("deep_stone", 5F, 10F, true, false, true, false),
+                cobbleEntry("deep_cobblestone", 4F, 9F, false, true, true, false),
+                cobbleEntry("cracked_deep_stone", 2F, 7F, true, false, false, true),
+                cobbleEntry("broken_deep_stone", 1F, 6F, true, false, false, true),
+                cobbleEntry("crumbling_deep_stone", 0.5F, 5F, true, false, false, true),
 
-                cobbleEntry("boulder_stone", 3F, 7F, true, false, true),
-                cobbleEntry("boulder_cobblestone", 2F, 6F, false, true, true),
-                cobbleEntry("cracked_boulder_stone", 1F, 6F, true, false, false),
-                cobbleEntry("broken_boulder_stone", 0.5F, 5F, true, false, false),
-                cobbleEntry("crumbling_boulder_stone", 0.25F, 4F, true, false, false),
+                cobbleEntry("boulder_stone", 3F, 7F, true, false, true, false),
+                cobbleEntry("boulder_cobblestone", 2F, 6F, false, true, true, false),
+                cobbleEntry("cracked_boulder_stone", 1F, 6F, true, false, false, true),
+                cobbleEntry("broken_boulder_stone", 0.5F, 5F, true, false, false, true),
+                cobbleEntry("crumbling_boulder_stone", 0.25F, 4F, true, false, false, true),
 
-                cobbleEntry("stone", 1.5F, 5F, true, false, true),
-                cobbleEntry("loose_cobblestone", 1F, 5F, false, true, true),
-                cobbleEntry("cracked_stone", 0.5F, 4F, true, false, false),
-                cobbleEntry("broken_stone", 0.25F, 2F, true, false, false),
-                cobbleEntry("crumbling_stone", 0.125F, 3F, true, false, false)
+                cobbleEntry("stone", 1.5F, 5F, true, false, true, false),
+                cobbleEntry("loose_cobblestone", 1F, 5F, false, true, true, false),
+                cobbleEntry("cracked_stone", 0.5F, 4F, true, false, false, true),
+                cobbleEntry("broken_stone", 0.25F, 2F, true, false, false, true),
+                cobbleEntry("crumbling_stone", 0.125F, 3F, true, false, false, true)
         );
 
         List<RegistryUtils.BlockEntry> oreEntries = List.of(

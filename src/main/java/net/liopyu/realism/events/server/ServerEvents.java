@@ -1,7 +1,6 @@
 package net.liopyu.realism.events.server;
 
 import com.mojang.logging.LogUtils;
-import net.liopyu.realism.util.TaskScheduler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -24,64 +23,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.List;
 import java.util.Map;
 
 @EventBusSubscriber
 public class ServerEvents {
-    /*@SubscribeEvent
-    public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
-        BlockState placed = event.getPlacedBlock();
-        ResourceLocation placedId = BuiltInRegistries.BLOCK.getKey(placed.getBlock());
-        if (placedId == null) {
-            LogUtils.getLogger().info("BLOCK STACK: Placed block id is null");
-            return;
-        }
-        String placedPath = placedId.getPath();
-
-        if (!(placedPath.endsWith("cobblestone"))) {
-            LogUtils.getLogger().info("BLOCK STACK: Not a cobblestone block: {}", placedPath);
-            return;
-        }
-
-        Level level = (Level) event.getLevel();
-        BlockPos slabPos = event.getPos().below();
-        BlockState slabState = level.getBlockState(slabPos);
-        ResourceLocation slabId = BuiltInRegistries.BLOCK.getKey(slabState.getBlock());
-        if (slabId == null) {
-            LogUtils.getLogger().info("BLOCK STACK: Slab below id is null");
-            return;
-        }
-
-        String expectedSlab = placedPath + "_slab";
-        if (!slabId.getPath().equals(expectedSlab)) {
-            LogUtils.getLogger().info("BLOCK STACK: Slab below is not matching expected: {} vs {}", slabId.getPath(), expectedSlab);
-            return;
-        }
-        TaskScheduler.scheduleNextTick(() -> {
-            BlockPos slabAbove = event.getPos();
-
-            Block fullBlock = placed.getBlock();
-            level.setBlock(slabPos, fullBlock.defaultBlockState(), 3);
-
-            Block slabBlock = slabState.getBlock();
-            level.setBlock(slabAbove, slabBlock.defaultBlockState(), 3);
-            LogUtils.getLogger().info("BLOCK STACK: Success. Promoted {} at {} to full block and set slab at {}", expectedSlab, slabPos, slabAbove);
-
-        });
-
-
-        event.setCanceled(true);
-    }*/
-
-    @SubscribeEvent
-    public static void onServerTick(ServerTickEvent.Post event) {
-        TaskScheduler.runScheduled();
-    }
-
-
     @SubscribeEvent
     public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
         Player player = event.getEntity();

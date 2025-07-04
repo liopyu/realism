@@ -23,7 +23,7 @@
             },
             {
               "type": "minecraft:item",
-              "name": "realism:cobblestone"
+              "name": "realism:loose_cobblestone"
             }
           ]
         }

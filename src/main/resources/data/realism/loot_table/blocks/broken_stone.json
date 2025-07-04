@@ -5,44 +5,18 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "minecraft:loot_table",
-          "value": "",
-          "functions": [],
-          "conditions": []
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:inverted",
-          "term": {
-            "condition": "minecraft:match_tool",
-            "predicate": {
-              "predicates": {
-                "minecraft:enchantments": [
-                  { "enchantments": "minecraft:silk_touch" }
-                ]
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
-        {
           "type": "minecraft:item",
           "name": "realism:broken_stone",
           "conditions": [
             {
               "condition": "minecraft:match_tool",
-              "predicate": {
-                "predicates": {
-                  "minecraft:enchantments": [
-                    { "enchantments": "minecraft:silk_touch" }
-                  ]
-                }
-              }
+"predicate": {
+  "predicates": {
+    "minecraft:enchantments": [
+      { "enchantments": "minecraft:silk_touch" }
+    ]
+  }
+}
             }
           ]
         },
@@ -54,8 +28,8 @@
               "function": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
-                "min": 4,
-                "max": 6
+                "min": 2,
+                "max": 5
               }
             },
             { "function": "minecraft:explosion_decay" }
@@ -65,13 +39,13 @@
               "condition": "minecraft:inverted",
               "term": {
                 "condition": "minecraft:match_tool",
-                "predicate": {
-                  "predicates": {
-                    "minecraft:enchantments": [
-                      { "enchantments": "minecraft:silk_touch" }
-                    ]
-                  }
-                }
+"predicate": {
+  "predicates": {
+    "minecraft:enchantments": [
+      { "enchantments": "minecraft:silk_touch" }
+    ]
+  }
+}
               }
             }
           ]

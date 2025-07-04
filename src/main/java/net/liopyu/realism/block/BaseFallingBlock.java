@@ -72,36 +72,6 @@ public class BaseFallingBlock extends Block implements Fallable {
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (level.isClientSide() || isMoving) return;
-
-        ResourceLocation placedId = BuiltInRegistries.BLOCK.getKey(this);
-        if (placedId == null) return;
-        String placedPath = placedId.getPath();
-
-        if (!placedPath.endsWith("cobblestone")) {
-            level.scheduleTick(pos, this, this.getDelayAfterPlace());
-            return;
-        }
-
-        BlockPos below = pos.below();
-        BlockState belowState = level.getBlockState(below);
-        ResourceLocation slabId = BuiltInRegistries.BLOCK.getKey(belowState.getBlock());
-        if (slabId == null) {
-            level.scheduleTick(pos, this, this.getDelayAfterPlace());
-            return;
-        }
-        
-        String expectedSlab = placedPath + "_slab";
-        if (slabId.getPath().equals(expectedSlab)) {
-            Block slabBlock = belowState.getBlock();
-            level.setBlock(below, this.defaultBlockState(), 3);
-            level.setBlock(pos, slabBlock.defaultBlockState(), 3);
-
-            LogUtils.getLogger().info("BLOCK STACK: Success. Promoted {} at {} to full block and set slab at {}", expectedSlab, below, pos);
-
-            return;
-        }
-
         level.scheduleTick(pos, this, this.getDelayAfterPlace());
     }
 

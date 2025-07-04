@@ -249,9 +249,9 @@ public class JsonFileGenerator {
         BASEBLOCKS.forEach(name -> {
             generateBlockJson(name);
             if (name.contains("ore")) {
-                generateOreLootTableWithPebble(name, getVanillaOreLootTable(name));
+                generateOreLootTableWithPebble(name, getVanillaOreLootTable(name), 2, 5);
             } else {
-                generateOreLootTableWithPebble(name, "");
+                generateOreLootTableWithPebble(name, null, 2, 5);
             }
         });
         BLOCK_NAMES.forEach((name) -> {
@@ -280,7 +280,7 @@ public class JsonFileGenerator {
         System.out.println("JSON generation complete.");
     }
 
-    public static void generateOreLootTableWithPebble(String blockName, String vanillaLootTable) {
+    public static void generateOreLootTableWithPebble(String blockName, String vanillaLootTable, int minPebble, int maxPebble) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
         String pebble;
         if (blockName.startsWith("deep_") || blockName.contains("_deep_")) {
@@ -291,37 +291,43 @@ public class JsonFileGenerator {
             pebble = "realism:stone_pebble";
         }
 
-        String content =
-                "{\n" +
-                        "  \"type\": \"minecraft:block\",\n" +
-                        "  \"pools\": [\n" +
-                        "    {\n" +
-                        "      \"rolls\": 1,\n" +
-                        "      \"entries\": [\n" +
-                        "        {\n" +
-                        "          \"type\": \"minecraft:loot_table\",\n" +
-                        "          \"value\": \"" + vanillaLootTable + "\",\n" +
-                        "          \"functions\": [],\n" +
-                        "          \"conditions\": []\n" +
-                        "        }\n" +
-                        "      ],\n" +
-                        "      \"conditions\": [\n" +
-                        "        {\n" +
-                        "          \"condition\": \"minecraft:inverted\",\n" +
-                        "          \"term\": {\n" +
-                        "            \"condition\": \"minecraft:match_tool\",\n" +
-                        "            \"predicate\": {\n" +
-                        "              \"predicates\": {\n" +
-                        "                \"minecraft:enchantments\": [\n" +
-                        "                  { \"enchantments\": \"minecraft:silk_touch\" }\n" +
-                        "                ]\n" +
-                        "              }\n" +
-                        "            }\n" +
-                        "          }\n" +
-                        "        }\n" +
-                        "      ]\n" +
-                        "    },\n" +
-                        "    {\n" +
+        String silkTouchPredicate =
+                "\"predicate\": {\n" +
+                        "  \"predicates\": {\n" +
+                        "    \"minecraft:enchantments\": [\n" +
+                        "      { \"enchantments\": \"minecraft:silk_touch\" }\n" +
+                        "    ]\n" +
+                        "  }\n" +
+                        "}";
+
+        StringBuilder pools = new StringBuilder();
+        pools.append("  \"pools\": [\n");
+
+        if (vanillaLootTable != null && !vanillaLootTable.isEmpty()) {
+            pools.append(
+                    "    {\n" +
+                            "      \"rolls\": 1,\n" +
+                            "      \"entries\": [\n" +
+                            "        {\n" +
+                            "          \"type\": \"minecraft:loot_table\",\n" +
+                            "          \"value\": \"" + vanillaLootTable + "\"\n" +
+                            "        }\n" +
+                            "      ],\n" +
+                            "      \"conditions\": [\n" +
+                            "        {\n" +
+                            "          \"condition\": \"minecraft:inverted\",\n" +
+                            "          \"term\": {\n" +
+                            "            \"condition\": \"minecraft:match_tool\",\n" +
+                            silkTouchPredicate + "\n" +
+                            "          }\n" +
+                            "        }\n" +
+                            "      ]\n" +
+                            "    },\n"
+            );
+        }
+
+        pools.append(
+                "    {\n" +
                         "      \"rolls\": 1,\n" +
                         "      \"entries\": [\n" +
                         "        {\n" +
@@ -330,13 +336,7 @@ public class JsonFileGenerator {
                         "          \"conditions\": [\n" +
                         "            {\n" +
                         "              \"condition\": \"minecraft:match_tool\",\n" +
-                        "              \"predicate\": {\n" +
-                        "                \"predicates\": {\n" +
-                        "                  \"minecraft:enchantments\": [\n" +
-                        "                    { \"enchantments\": \"minecraft:silk_touch\" }\n" +
-                        "                  ]\n" +
-                        "                }\n" +
-                        "              }\n" +
+                        silkTouchPredicate + "\n" +
                         "            }\n" +
                         "          ]\n" +
                         "        },\n" +
@@ -348,8 +348,8 @@ public class JsonFileGenerator {
                         "              \"function\": \"minecraft:set_count\",\n" +
                         "              \"count\": {\n" +
                         "                \"type\": \"minecraft:uniform\",\n" +
-                        "                \"min\": 4,\n" +
-                        "                \"max\": 6\n" +
+                        "                \"min\": " + minPebble + ",\n" +
+                        "                \"max\": " + maxPebble + "\n" +
                         "              }\n" +
                         "            },\n" +
                         "            { \"function\": \"minecraft:explosion_decay\" }\n" +
@@ -359,25 +359,24 @@ public class JsonFileGenerator {
                         "              \"condition\": \"minecraft:inverted\",\n" +
                         "              \"term\": {\n" +
                         "                \"condition\": \"minecraft:match_tool\",\n" +
-                        "                \"predicate\": {\n" +
-                        "                  \"predicates\": {\n" +
-                        "                    \"minecraft:enchantments\": [\n" +
-                        "                      { \"enchantments\": \"minecraft:silk_touch\" }\n" +
-                        "                    ]\n" +
-                        "                  }\n" +
-                        "                }\n" +
+                        silkTouchPredicate + "\n" +
                         "              }\n" +
                         "            }\n" +
                         "          ]\n" +
                         "        }\n" +
                         "      ]\n" +
                         "    }\n" +
-                        "  ]\n" +
+                        "  ]\n"
+        );
+
+        String content =
+                "{\n" +
+                        "  \"type\": \"minecraft:block\",\n" +
+                        pools +
                         "}";
 
         writeFile(path, blockName + ".json", content);
     }
-
 
     public static void generateSimpleItemModelJson(String itemName, String textureName) {
         String path = ASSETS_PATH + "models/item/";
@@ -471,6 +470,7 @@ public class JsonFileGenerator {
     public static void generateStoneSimpleLoot(String name) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
         String cobbledName = name.replace("stone", "cobblestone");
+        if (name.startsWith("stone")) cobbledName = "loose_cobblestone";
         String content =
                 "{\n" +
                         "  \"type\": \"minecraft:block\",\n" +
@@ -521,7 +521,7 @@ public class JsonFileGenerator {
             pebble = "realism:stone_pebble";
         }
         String cobbledName = name.replace("stone", "cobblestone");
-
+        if (name.equals("stone")) cobbledName = "loose_cobblestone";
         String path = "src/main/resources/data/realism/loot_table/blocks/";
         String silkTouchCheck =
                 "{\n" +
@@ -591,10 +591,20 @@ public class JsonFileGenerator {
         writeFile(path, name + ".json", content);
     }
 
-
     public static void generateCobbleLikeLootTableJson(String name) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
-        String base = name.contains("_slab") ? "cobblestone_slab" : "cobblestone";
+
+        String base;
+        if (name.endsWith("_slab")) {
+            base = name.replace("_slab", "");
+        } else if (name.endsWith("_stairs")) {
+            base = name.replace("_stairs", "");
+        } else if (name.endsWith("_wall")) {
+            base = name.replace("_wall", "");
+        } else {
+            base = name;
+        }
+
         String content =
                 "{\n" +
                         "  \"type\": \"minecraft:block\",\n" +
@@ -617,8 +627,10 @@ public class JsonFileGenerator {
                         "  ],\n" +
                         "  \"random_sequence\": \"realism:blocks/" + base + "\"\n" +
                         "}";
+
         writeFile(path, name + ".json", content);
     }
+
 
     public static void generateSlabLootTableJson(String name) {
         String path = "src/main/resources/data/realism/loot_table/blocks/";
@@ -693,7 +705,6 @@ public class JsonFileGenerator {
     }
 
     public static void generateBlockJson(String name) {
-        // if (!FMLEnvironment.production) return;
         generateBlockModelJson(name);
 
         String path = ASSETS_PATH + "blockstates/";
@@ -709,8 +720,9 @@ public class JsonFileGenerator {
     }
 
     private static void generateBlockModelJson(String name) {
-        // if (!FMLEnvironment.production) return;
-        generateBlockModelJson(name, "cube_all");
+        if (!(name.contains("cracked") || name.contains("broken") || name.contains("crumbling"))) {
+            generateBlockModelJson(name, "cube_all");
+        }
     }
 
     private static void generateBlockModelJson(String name, String parent) {
