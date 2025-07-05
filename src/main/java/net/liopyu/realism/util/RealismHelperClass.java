@@ -71,9 +71,6 @@ public class RealismHelperClass {
         }
     }
 
-    public static Block getRealismBlock(String name) {
-        return BuiltInRegistries.BLOCK.getValue(ResourceLocation.fromNamespaceAndPath(Realism.MODID, name));
-    }
 
     public static void logWarningMessageOnce(String errorMessage) {
         if (!warningMessagesLogged.contains(errorMessage)) {

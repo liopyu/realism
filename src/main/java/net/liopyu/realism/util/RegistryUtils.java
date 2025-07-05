@@ -34,7 +34,7 @@ public class RegistryUtils {
             List<String> names
     ) {
         for (String name : names) {
-            items.register(name, () -> new Item(new Item.Properties().stacksTo(64).setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MODID, name)))));
+            items.register(name, () -> new Item(new Item.Properties().stacksTo(64)));
         }
     }
 
@@ -73,7 +73,6 @@ public class RegistryUtils {
                                 BlockBehaviour.Properties props = (entry.propertiesFactory != null)
                                         ? entry.propertiesFactory.apply(baseBlock)
                                         : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                                props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
                                 var cobbledSlab = new BaseFallingSlab(props, blockHolder.get());
                                 if (blockHolder.get() instanceof BaseFallingBlock baseFallingBlock) {
                                     baseFallingBlock.setCobbledSlab(cobbledSlab);
@@ -91,7 +90,6 @@ public class RegistryUtils {
                                 BlockBehaviour.Properties props = (entry.propertiesFactory != null)
                                         ? entry.propertiesFactory.apply(baseBlock)
                                         : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                                props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
                                 return new BaseFallingStair(baseBlock.defaultBlockState(), props);
                             }
                     );
@@ -103,7 +101,6 @@ public class RegistryUtils {
                                 BlockBehaviour.Properties props = (entry.propertiesFactory != null)
                                         ? entry.propertiesFactory.apply(baseBlock)
                                         : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                                props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
                                 return new BaseFallingWall(props);
                             }
                     );
@@ -118,7 +115,6 @@ public class RegistryUtils {
                                 BlockBehaviour.Properties props = (entry.propertiesFactory != null)
                                         ? entry.propertiesFactory.apply(baseBlock)
                                         : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                                props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
                                 return new SlabBlock(props);
                             }
                     );
@@ -132,7 +128,6 @@ public class RegistryUtils {
                                 BlockBehaviour.Properties props = (entry.propertiesFactory != null)
                                         ? entry.propertiesFactory.apply(baseBlock)
                                         : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                                props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
                                 return new StairBlock(baseBlock.defaultBlockState(), props);
                             }
                     );
@@ -144,7 +139,6 @@ public class RegistryUtils {
                                 BlockBehaviour.Properties props = (entry.propertiesFactory != null)
                                         ? entry.propertiesFactory.apply(baseBlock)
                                         : BlockBehaviour.Properties.ofFullCopy(baseBlock);
-                                props = props.setId(ResourceKey.create(Registries.BLOCK, rl));
                                 return new net.minecraft.world.level.block.WallBlock(props);
                             }
                     );

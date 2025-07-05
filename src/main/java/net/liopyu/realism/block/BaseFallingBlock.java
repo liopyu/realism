@@ -19,8 +19,6 @@ import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -127,21 +125,6 @@ public class BaseFallingBlock extends Block implements Fallable {
     }
 
 
-    @Override
-    protected BlockState updateShape(
-            BlockState state,
-            LevelReader level,
-            ScheduledTickAccess scheduledTickAccess,
-            BlockPos pos,
-            Direction direction,
-            BlockPos neighborPos,
-            BlockState neighborState,
-            RandomSource random
-    ) {
-        scheduledTickAccess.scheduleTick(pos, this, this.getDelayAfterPlace());
-        return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
-    }
-
     public static final TagKey<Block> CEILING_SUPPORTS_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("realism", "falling_block_ceiling_supports"));
 
     @Override
@@ -184,18 +167,18 @@ public class BaseFallingBlock extends Block implements Fallable {
         if (!isCobbled) {
             String cobbledName = id.getPath().replace("_stone", "_cobblestone");
             ResourceLocation cobbledId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), cobbledName);
-            var ref = BuiltInRegistries.BLOCK.get(cobbledId);
+            var ref = BuiltInRegistries.BLOCK.getOptional(cobbledId);
             if (id.getNamespace().equals("realism") && id.getPath().equals("stone")) {
                 ResourceLocation looseId = ResourceLocation.fromNamespaceAndPath("realism", "loose_cobblestone");
-                var looseRef = BuiltInRegistries.BLOCK.get(looseId);
+                var looseRef = BuiltInRegistries.BLOCK.getOptional(looseId);
                 if (looseRef.isPresent()) {
-                    Block loosed = looseRef.get().value();
+                    Block loosed = looseRef.get();
                     if (entity instanceof FallingBlockAccess access) {
                         access.setBlockstate(loosed.defaultBlockState().setValue(PLACED, false));
                     }
                 }
             } else if (ref.isPresent()) {
-                Block cobbled = ref.get().value();
+                Block cobbled = ref.get();
                 if (entity instanceof FallingBlockAccess access) {
                     access.setBlockstate(cobbled.defaultBlockState().setValue(PLACED, false));
                 }

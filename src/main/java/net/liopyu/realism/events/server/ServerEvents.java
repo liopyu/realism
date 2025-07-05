@@ -28,7 +28,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -108,7 +107,7 @@ public class ServerEvents {
         int dx = (int) Math.round(eyePos.x - center.x);
         int dy = (int) Math.round(eyePos.y - center.y);
         int dz = (int) Math.round(eyePos.z - center.z);
-        return Direction.getNearest(dx, dy, dz, Direction.NORTH);
+        return Direction.getNearest(dx, dy, dz);
     }
 
 
@@ -147,8 +146,8 @@ public class ServerEvents {
                 stage++;
             }
             if (stage < chain.length) {
-                Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(chain[stage])).isPresent()
-                        ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(chain[stage])).get().value() : null;
+                Block nextBlock = BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(chain[stage])).isPresent()
+                        ? BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(chain[stage])).get() : null;
                 if (nextBlock instanceof BaseFallingBlock baseFallingBlock) {
                     Set<Direction> indentFaces = new HashSet<>();
                     indentFaces.add(Direction.NORTH);
@@ -176,8 +175,8 @@ public class ServerEvents {
             for (int i = 0; i < chain.length - 1; i++) {
                 if (chain[i].equals(key)) {
                     String next = chain[i + 1];
-                    Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(next)).isPresent()
-                            ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(next)).get().value() : null;
+                    Block nextBlock = BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(next)).isPresent()
+                            ? BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(next)).get() : null;
                     if (nextBlock instanceof BaseFallingBlock baseFallingBlock) {
                         Direction parentDir = state.hasProperty(BaseFallingBlock.FACING)
                                 ? state.getValue(BaseFallingBlock.FACING)
@@ -250,11 +249,11 @@ public class ServerEvents {
                             oreType.equals("boulder_") ? "realism:broken_boulder_stone" :
                                     "realism:broken_stone";
 
-            Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(brokenBlock))
-                    .isPresent() ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(brokenBlock)).get().value() : null;
+            Block nextBlock = BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(brokenBlock))
+                    .isPresent() ? BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(brokenBlock)).get() : null;
 
-            if (block.getLootTable().isPresent() && event.getLevel() instanceof ServerLevel serverLevel && nextBlock != null) {
-                ResourceKey<LootTable> lootTableKey = block.getLootTable().get();
+            if (block.getLootTable() != null && event.getLevel() instanceof ServerLevel serverLevel && nextBlock != null) {
+                ResourceKey<LootTable> lootTableKey = block.getLootTable();
                 LootTable lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(lootTableKey);
 
                 LootParams.Builder paramsBuilder = new LootParams.Builder(serverLevel)

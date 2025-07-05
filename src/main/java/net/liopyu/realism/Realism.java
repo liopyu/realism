@@ -22,7 +22,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
@@ -73,7 +73,6 @@ public class Realism {
                 name,
                 rl -> {
                     BlockBehaviour.Properties props = BlockBehaviour.Properties.of()
-                            .setId(ResourceKey.create(Registries.BLOCK, rl))
                             .mapColor(MapColor.STONE)
                             .instrument(NoteBlockInstrument.BASEDRUM)
 
@@ -105,7 +104,6 @@ public class Realism {
                 rl -> new DropExperienceBlock(
                         UniformInt.of(xpMin, xpMax),
                         BlockBehaviour.Properties.of()
-                                .setId(ResourceKey.create(Registries.BLOCK, rl))
                                 .mapColor(MapColor.STONE)
                                 .instrument(NoteBlockInstrument.BASEDRUM)
                                 .requiresCorrectToolForDrops()
@@ -130,8 +128,8 @@ public class Realism {
         }
     }
 
-    public static void onReload(AddServerReloadListenersEvent event) {
-        event.addListener(ResourceLocation.parse("realism:config_reload"), new RealismReloadListener());
+    public static void onReload(AddReloadListenerEvent event) {
+        event.addListener(new RealismReloadListener());
     }
 
     public Realism(IEventBus bus) {
@@ -192,22 +190,22 @@ public class Realism {
         TABS.register("realism", () ->
                 CreativeModeTab.builder()
                         .title(Component.translatable("itemGroup.realism"))
-                        .icon(() -> new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":deep_stone")).get()))
+                        .icon(() -> new ItemStack(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":deep_stone")).get()))
                         .displayItems((params, output) -> {
                             for (var entry : entries) {
-                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name())).get().value());
+                                output.accept(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":" + entry.name())).get());
                                 if (entry.createVariants()) {
-                                    output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_slab")).get().value());
-                                    output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_stairs")).get().value());
-                                    output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name() + "_wall")).get().value());
+                                    output.accept(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":" + entry.name() + "_slab")).get());
+                                    output.accept(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":" + entry.name() + "_stairs")).get());
+                                    output.accept(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":" + entry.name() + "_wall")).get());
                                 }
 
                             }
                             for (var entry : oreEntries) {
-                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry.name())).get().value());
+                                output.accept(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":" + entry.name())).get());
                             }
                             for (var entry : itemNames) {
-                                output.accept(BuiltInRegistries.ITEM.get(ResourceLocation.parse(MODID + ":" + entry)).get().value());
+                                output.accept(BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(MODID + ":" + entry)).get());
                             }
                         })
                         .build()
