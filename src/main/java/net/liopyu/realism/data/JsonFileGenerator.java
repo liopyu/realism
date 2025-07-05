@@ -379,7 +379,7 @@ public class JsonFileGenerator {
         writeFile(path, blockName + ".json", content);
     }
 
-    public static void generateSimpleItemModelJson(String itemName, String textureName) {
+    private static void generateSimpleItemModelJson(String itemName, String textureName) {
         String path = ASSETS_PATH + "models/item/";
         String content = "{\n" +
                 "  \"parent\": \"minecraft:item/generated\",\n" +
@@ -1476,39 +1476,35 @@ public class JsonFileGenerator {
     }
 
     private static void generateItemModelJson(String name, boolean isWall) {
-        String path = ASSETS_PATH + "items/";
-        var finalName = isWall ? name + "_inventory" : name;
+        String path = ASSETS_PATH + "models/item/";
+        String parentName = isWall ? name + "_inventory" : name;
         String content =
                 "{\n" +
-                        "  \"model\": {\n" +
-                        "    \"type\": \"minecraft:model\",\n" +
-                        "    \"model\": \"realism:block/" + finalName + "\"\n" +
-                        "  }\n" +
+                        "  \"parent\": \"realism:block/" + parentName + "\"\n" +
                         "}";
         writeFile(path, name + ".json", content);
     }
 
+
     private static void generateItemModelJsonToPath(String name, String p) {
-        String path = ASSETS_PATH + "items/";
+        String path = ASSETS_PATH + "models/item/";
         String content =
                 "{\n" +
-                        "  \"model\": {\n" +
-                        "    \"type\": \"minecraft:model\",\n" +
-                        "    \"model\": \"" + p + "\"\n" +
-                        "  }\n" +
+                        "  \"parent\": \"" + p + "\"\n" +
                         "}";
         writeFile(path, name + ".json", content);
     }
 
     private static void generateItemModelJson(String name) {
-        String path = ASSETS_PATH + "items/";
+        String path = ASSETS_PATH + "models/item/";
         String content =
                 "{\n" +
-                        "  \"model\": {\n" +
-                        "    \"type\": \"minecraft:model\",\n" +
-                        "    \"model\": \"realism:block/" + name + "\"\n" +
+                        "  \"parent\": \"minecraft:item/generated\",\n" +
+                        "  \"textures\": {\n" +
+                        "    \"layer0\": \"realism:item/" + name + "\"\n" +
                         "  }\n" +
                         "}";
+
         writeFile(path, name + ".json", content);
     }
 

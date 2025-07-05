@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "realism:item/stone_pebble"
-  }
+  "parent": "realism:item/stone_pebble"
 }
