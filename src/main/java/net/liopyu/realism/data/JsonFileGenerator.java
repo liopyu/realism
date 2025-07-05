@@ -708,16 +708,60 @@ public class JsonFileGenerator {
         generateBlockModelJson(name);
 
         String path = ASSETS_PATH + "blockstates/";
-        String content = String.format(
-                "{\n" +
-                        "  \"variants\": {\n" +
-                        "    \"\": { \"model\": \"realism:block/%s\" }\n" +
-                        "  }\n" +
-                        "}", name);
+        String content;
+
+        if (name.contains("cracked") || name.contains("broken") || name.contains("crumbling")) {
+            String[] models = {
+                    "0", "0_1", "0_2", "0_3", "0_4", "0_5",
+                    "0_1_2", "0_1_3", "0_1_4", "0_1_5",
+                    "0_2_3", "0_2_4", "0_2_5",
+                    "0_3_4", "0_3_5", "0_4_5"
+            };
+            String[] facings = {"north", "south", "west", "east", "up", "down"};
+            int[] yRot = {0, 180, 270, 90, 0, 0};
+            int[] xRot = {0, 0, 0, 0, 270, 90};
+
+
+            StringBuilder variants = new StringBuilder();
+            for (int i = 0; i < models.length; i++) {
+                for (int f = 0; f < facings.length; f++) {
+                    variants.append("    \"indent_index=").append(i)
+                            .append(",facing=").append(facings[f])
+                            .append("\": { \"model\": \"realism:block/indent_").append(models[i]).append("\"");
+
+                    if (!facings[f].equals("north")) {
+                        if (facings[f].equals("up") || facings[f].equals("down")) {
+                            variants.append(", \"x\": ").append(xRot[f]);
+                        } else {
+                            variants.append(", \"y\": ").append(yRot[f]);
+                        }
+                    }
+                    variants.append(" }");
+                    if (!(i == models.length - 1 && f == facings.length - 1)) {
+                        variants.append(",");
+                    }
+                    variants.append("\n");
+                }
+            }
+            content = "{\n" +
+                    "  \"variants\": {\n" +
+                    variants +
+                    "  }\n" +
+                    "}";
+        } else {
+            content = String.format(
+                    "{\n" +
+                            "  \"variants\": {\n" +
+                            "    \"\": { \"model\": \"realism:block/%s\" }\n" +
+                            "  }\n" +
+                            "}", name);
+        }
+
         writeFile(path, name + ".json", content);
 
         generateItemModelJson(name);
     }
+
 
     private static void generateBlockModelJson(String name) {
         if (!(name.contains("cracked") || name.contains("broken") || name.contains("crumbling"))) {
@@ -726,7 +770,6 @@ public class JsonFileGenerator {
     }
 
     private static void generateBlockModelJson(String name, String parent) {
-        // if (!FMLEnvironment.production) return;
         String path = ASSETS_PATH + "models/block/";
         String content = "{\n" +
                 "  \"parent\": \"block/" + parent + "\",\n" +

@@ -25,22 +25,36 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import org.jline.utils.Log;
-
-import java.util.Objects;
-
-import static net.liopyu.realism.Realism.MODID;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 public class BaseFallingBlock extends Block implements Fallable {
     public Block cobbledSlab;
     public final boolean isCobbled;
     public String registryName;
+    public static final IntegerProperty INDENT_INDEX = IntegerProperty.create("indent_index", 0, 15);
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
+    public Direction parentDirection;
 
     public BaseFallingBlock(BlockBehaviour.Properties properties, boolean isCobbled) {
         super(properties);
         this.isCobbled = isCobbled;
-        this.registerDefaultState(this.stateDefinition.any().setValue(PLACED, false));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(PLACED, false)
+                .setValue(FACING, Direction.NORTH)
+                .setValue(INDENT_INDEX, 0)
+        );
+
+    }
+
+    public Direction getParentDirection() {
+        return parentDirection;
+    }
+
+    public void setParentDirection(Direction parentDirection) {
+        this.parentDirection = parentDirection;
     }
 
     public void setRegistryName(String registryName) {
@@ -51,17 +65,54 @@ public class BaseFallingBlock extends Block implements Fallable {
         this.cobbledSlab = cobbledSlab;
     }
 
+    public void setIndentIndex(Level level, BlockPos pos, int i) {
+        BlockState current = level.getBlockState(pos);
+        if (current.getBlock() == this && current.hasProperty(INDENT_INDEX)) {
+            level.setBlock(pos, current.setValue(INDENT_INDEX, i), 3);
+        }
+    }
+
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(PLACED);
+        builder.add(PLACED, INDENT_INDEX, FACING);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return super.getStateForPlacement(context).setValue(PLACED, true);
+        return super.getStateForPlacement(context)
+                .setValue(PLACED, true)
+                .setValue(FACING, context.getHorizontalDirection().getOpposite())
+                .setValue(INDENT_INDEX, 0);
     }
+
+    public void setFacing(Level level, BlockPos pos, Direction facing) {
+        BlockState state = level.getBlockState(pos);
+        if (state.hasProperty(FACING)) {
+            level.setBlock(pos, state.setValue(FACING, facing), 3);
+        }
+    }
+
+    public void cycleFacing(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (state.hasProperty(FACING)) {
+            Direction current = state.getValue(FACING);
+            Direction next;
+            switch (current) {
+                case NORTH -> next = Direction.EAST;
+                case EAST -> next = Direction.SOUTH;
+                case SOUTH -> next = Direction.WEST;
+                case WEST -> next = Direction.UP;
+                case UP -> next = Direction.DOWN;
+                case DOWN -> next = Direction.NORTH;
+                default -> next = Direction.NORTH;
+            }
+            level.setBlock(pos, state.setValue(FACING, next), 3);
+            LogUtils.getLogger().info("Block at {} now facing: {}", pos, next);
+        }
+    }
+
 
     @Override
     public MapCodec<? extends Block> codec() {
