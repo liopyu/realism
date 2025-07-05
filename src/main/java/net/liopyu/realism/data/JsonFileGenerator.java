@@ -247,6 +247,7 @@ public class JsonFileGenerator {
             generateItemModelJsonToPath(name, "realism:item/" + name);
         });
         BASEBLOCKS.forEach(name -> {
+            generateIndentModelVariants(name);
             generateBlockJson(name);
             if (name.contains("ore")) {
                 generateOreLootTableWithPebble(name, getVanillaOreLootTable(name), 2, 5);
@@ -704,6 +705,51 @@ public class JsonFileGenerator {
         writeFile(path, name + ".json", content);
     }
 
+    private static final String[] INDENT_MODELS = {
+            "0", "0_1", "0_2", "0_3", "0_4", "0_5",
+            "0_1_2", "0_1_3", "0_1_4", "0_1_5",
+            "0_2_3", "0_2_4", "0_2_5",
+            "0_3_4", "0_3_5", "0_4_5"
+    };
+    private static final String[] DAMAGE_VARIANTS = {"cracked", "broken", "crumbling"};
+
+    private static void generateIndentModelVariants(String name) {
+        String prefix, subfolder;
+        if (name.contains("deep_")) {
+            prefix = "deep_";
+            subfolder = "deep/";
+        } else if (name.contains("boulder_")) {
+            prefix = "boulder_";
+            subfolder = "boulder/";
+        } else {
+            prefix = "stone_";
+            subfolder = "stone/";
+        }
+
+        if (!(name.contains("cracked") || name.contains("broken") || name.contains("crumbling"))) return;
+
+        String damage = "cracked";
+        if (name.contains("broken")) damage = "broken";
+        if (name.contains("crumbling")) damage = "crumbling";
+
+        String texture = "realism:block/" + name;
+        String path = ASSETS_PATH + "models/block/variant/" + subfolder + damage + "/";
+
+        for (String indent : INDENT_MODELS) {
+            String modelName = prefix + damage + "_indent_" + indent;
+            String parentName = "realism:block/variant/" + damage + "/" + damage + "_indent_" + indent;
+
+            String content =
+                    "{\n" +
+                            "  \"parent\": \"" + parentName + "\",\n" +
+                            "  \"textures\": {\n" +
+                            "    \"0\": \"" + texture + "\"\n" +
+                            "  }\n" +
+                            "}";
+            writeFile(path, modelName + ".json", content);
+        }
+    }
+
     public static void generateBlockJson(String name) {
         generateBlockModelJson(name);
 
@@ -711,23 +757,35 @@ public class JsonFileGenerator {
         String content;
 
         if (name.contains("cracked") || name.contains("broken") || name.contains("crumbling")) {
-            String[] models = {
-                    "0", "0_1", "0_2", "0_3", "0_4", "0_5",
-                    "0_1_2", "0_1_3", "0_1_4", "0_1_5",
-                    "0_2_3", "0_2_4", "0_2_5",
-                    "0_3_4", "0_3_5", "0_4_5"
-            };
+            String[] models = INDENT_MODELS;
             String[] facings = {"north", "south", "west", "east", "up", "down"};
             int[] yRot = {0, 180, 270, 90, 0, 0};
             int[] xRot = {0, 0, 0, 0, 270, 90};
 
+            String prefix, subfolder;
+            if (name.contains("deep_")) {
+                prefix = "deep_";
+                subfolder = "deep/";
+            } else if (name.contains("boulder_")) {
+                prefix = "boulder_";
+                subfolder = "boulder/";
+            } else {
+                prefix = "stone_";
+                subfolder = "stone/";
+            }
+
+            String damage = "cracked";
+            if (name.contains("broken")) damage = "broken";
+            if (name.contains("crumbling")) damage = "crumbling";
 
             StringBuilder variants = new StringBuilder();
             for (int i = 0; i < models.length; i++) {
                 for (int f = 0; f < facings.length; f++) {
                     variants.append("    \"indent_index=").append(i)
                             .append(",facing=").append(facings[f])
-                            .append("\": { \"model\": \"realism:block/indent_").append(models[i]).append("\"");
+                            .append("\": { \"model\": \"realism:block/variant/")
+                            .append(subfolder).append(damage).append("/")
+                            .append(prefix).append(damage).append("_indent_").append(models[i]).append("\"");
 
                     if (!facings[f].equals("north")) {
                         if (facings[f].equals("up") || facings[f].equals("down")) {

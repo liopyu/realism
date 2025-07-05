@@ -1,0 +1,6 @@
+{
+  "parent": "realism:block/variant/broken/broken_indent_0_1",
+  "textures": {
+    "0": "realism:block/broken_boulder_stone"
+  }
+}

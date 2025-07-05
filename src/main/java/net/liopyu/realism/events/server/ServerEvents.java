@@ -130,10 +130,10 @@ public class ServerEvents {
                 "realism:deep_stone", new String[]{"realism:cracked_deep_stone", "realism:broken_deep_stone", "realism:crumbling_deep_stone"}
         );
         Map<String, float[]> SPEED_THRESHOLDS = Map.of(
-                "minecraft:stone", new float[]{3f, 5f, 6f},
-                "realism:stone", new float[]{3f, 5f, 6f},
-                "realism:boulder_stone", new float[]{5f, 5f, 6f},
-                "realism:deep_stone", new float[]{8f, 8f, 9f}
+                "minecraft:stone", new float[]{30f, 50f, 60f},
+                "realism:stone", new float[]{30f, 50f, 60f},
+                "realism:boulder_stone", new float[]{50f, 50f, 60f},
+                "realism:deep_stone", new float[]{80f, 80f, 90f}
         );
 
         if (CHAINS.containsKey(key)) {
