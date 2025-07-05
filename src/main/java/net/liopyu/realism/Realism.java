@@ -1,8 +1,11 @@
 package net.liopyu.realism;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.events.server.ServerEvents;
+import net.liopyu.realism.util.RealismReloadListener;
 import net.liopyu.realism.util.RegistryUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -19,9 +22,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 @Mod(Realism.MODID)
@@ -32,7 +40,33 @@ public class Realism {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, MODID);
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static boolean FORCE_DEFAULT_INDENT_INDEX = false;
 
+    public static final File CONFIG_FILE = new File("config/realism.json");
+
+    public static void loadOrCreateConfig() {
+        Gson gson = new Gson();
+
+        if (!CONFIG_FILE.exists()) {
+            try {
+                CONFIG_FILE.getParentFile().mkdirs();
+                try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+                    writer.write("{\n  \"custom_models\": true\n}\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try (FileReader reader = new FileReader(CONFIG_FILE)) {
+            JsonObject obj = gson.fromJson(reader, JsonObject.class);
+            if (obj.has("custom_models")) {
+                FORCE_DEFAULT_INDENT_INDEX = obj.get("custom_models").getAsBoolean();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static RegistryUtils.BlockEntry cobbleEntry(String name, float strength, float resistance, boolean requiresTool, boolean isFalling, boolean createVariants, boolean noOcclusion) {
         return new RegistryUtils.BlockEntry(
@@ -81,13 +115,33 @@ public class Realism {
         );
     }
 
+    public static void ensureRealismConfigFile() {
+        File configFile = new File("config/realism.json");
+        if (!configFile.exists()) {
+            try {
+                configFile.getParentFile().mkdirs();
+                try (FileWriter writer = new FileWriter(configFile)) {
+                    writer.write("{\n  \"custom_models\": true\n}\n");
+                }
+                System.out.println("Generated default realism.json config at: " + configFile.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void onReload(AddServerReloadListenersEvent event) {
+        event.addListener(ResourceLocation.parse("realism:config_reload"), new RealismReloadListener());
+    }
 
     public Realism(IEventBus bus) {
         NeoForge.EVENT_BUS.register(ServerEvents.class);
+        NeoForge.EVENT_BUS.addListener(Realism::onReload);
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TABS.register(bus);
-
+        ensureRealismConfigFile();
+        loadOrCreateConfig();
         List<String> itemNames = List.of("stone_pebble", "deep_stone_pebble", "boulder_stone_pebble");
         RegistryUtils.registerItemsOnly(ITEMS, itemNames);
 

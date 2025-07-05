@@ -36,14 +36,11 @@ public class IndentIndexUtil {
         for (Direction d : faces) {
             normalized.add(relativeToNorth(d, facing));
         }
-        LogUtils.getLogger().info("getIndentIndex: faces={}, facing={}, normalized={}", faces, facing, normalized);
         Integer idx = INDENT_INDEX_MAP.get(normalized);
-        LogUtils.getLogger().info("Index lookup result: {}", idx != null ? idx : 0);
         return idx != null ? idx : 0;
     }
 
     public static Direction relativeToNorth(Direction face, Direction facing) {
-        LogUtils.getLogger().info("[relativeToNorth] face: {} facing: {}", face, facing);
         Direction result;
         if (facing == NORTH) result = face;
         else if (facing == EAST) {
@@ -94,12 +91,10 @@ public class IndentIndexUtil {
         } else {
             result = face;
         }
-        LogUtils.getLogger().info("[relativeToNorth] -> result: {}", result);
         return result;
     }
 
     public static Direction worldToModelRelative(Direction worldDir, Direction modelFacing) {
-        LogUtils.getLogger().info("[worldToModelRelative] worldDir: {} modelFacing: {}", worldDir, modelFacing);
         Direction result;
         if (modelFacing == NORTH) result = worldDir;
         else if (modelFacing == SOUTH) {
@@ -150,7 +145,6 @@ public class IndentIndexUtil {
         } else {
             result = worldDir;
         }
-        LogUtils.getLogger().info("[worldToModelRelative] -> result: {}", result);
         return result;
     }
 

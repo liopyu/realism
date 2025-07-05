@@ -739,11 +739,13 @@ public class JsonFileGenerator {
             String modelName = prefix + damage + "_indent_" + indent;
             String parentName = "realism:block/variant/" + damage + "/" + damage + "_indent_" + indent;
 
+            String particleTexture = texture.replace("block/", "block/particle/");
             String content =
                     "{\n" +
                             "  \"parent\": \"" + parentName + "\",\n" +
                             "  \"textures\": {\n" +
-                            "    \"0\": \"" + texture + "\"\n" +
+                            "    \"0\": \"" + texture + "\",\n" +
+                            "    \"particle\": \"" + particleTexture + "\"\n" +
                             "  }\n" +
                             "}";
             writeFile(path, modelName + ".json", content);
@@ -801,6 +803,24 @@ public class JsonFileGenerator {
                     variants.append("\n");
                 }
             }
+            variants.append(",");
+            for (int f = 0; f < facings.length; f++) {
+                variants.append("    \"indent_index=16,facing=").append(facings[f])
+                        .append("\": { \"model\": \"realism:block/").append(name).append("\"");
+                if (!facings[f].equals("north")) {
+                    if (facings[f].equals("up") || facings[f].equals("down")) {
+                        variants.append(", \"x\": ").append(xRot[f]);
+                    } else {
+                        variants.append(", \"y\": ").append(yRot[f]);
+                    }
+                }
+                variants.append(" }");
+                if (f != facings.length - 1) {
+                    variants.append(",");
+                }
+                variants.append("\n");
+            }
+
             content = "{\n" +
                     "  \"variants\": {\n" +
                     variants +
@@ -822,19 +842,39 @@ public class JsonFileGenerator {
 
 
     private static void generateBlockModelJson(String name) {
-        if (!(name.contains("cracked") || name.contains("broken") || name.contains("crumbling"))) {
-            generateBlockModelJson(name, "cube_all");
-        }
+        generateBlockModelJson(name, "cube_all");
     }
 
     private static void generateBlockModelJson(String name, String parent) {
         String path = ASSETS_PATH + "models/block/";
-        String content = "{\n" +
-                "  \"parent\": \"block/" + parent + "\",\n" +
-                "  \"textures\": {\n" +
-                "    \"all\": \"realism:block/" + name + "\"\n" +
-                "  }\n" +
-                "}";
+        String content;
+
+        String[] damageTypes = {"cracked", "crumbling", "broken"};
+        boolean isDamaged = false;
+        for (String dmg : damageTypes) {
+            if (name.contains(dmg)) {
+                isDamaged = true;
+                break;
+            }
+        }
+
+        if (isDamaged) {
+            content = "{\n" +
+                    "  \"parent\": \"block/" + parent + "\",\n" +
+                    "  \"textures\": {\n" +
+                    "    \"all\": \"realism:block/particle/" + name + "\",\n" +
+                    "    \"particle\": \"realism:block/particle/" + name + "\"\n" +
+                    "  }\n" +
+                    "}";
+        } else {
+            content = "{\n" +
+                    "  \"parent\": \"block/" + parent + "\",\n" +
+                    "  \"textures\": {\n" +
+                    "    \"all\": \"realism:block/" + name + "\"\n" +
+                    "  }\n" +
+                    "}";
+        }
+
         writeFile(path, name + ".json", content);
     }
 

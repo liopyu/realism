@@ -1,6 +1,7 @@
 {
   "parent": "realism:block/variant/crumbling/crumbling_indent_0_3",
   "textures": {
-    "0": "realism:block/crumbling_boulder_stone"
+    "0": "realism:block/crumbling_boulder_stone",
+    "particle": "realism:block/particle/crumbling_boulder_stone"
   }
 }

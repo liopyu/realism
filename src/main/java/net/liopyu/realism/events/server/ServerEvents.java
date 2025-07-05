@@ -3,6 +3,7 @@ package net.liopyu.realism.events.server;
 import com.mojang.logging.LogUtils;
 import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.util.IndentIndexUtil;
+import net.liopyu.realism.util.RealismReloadListener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,6 +28,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -36,11 +38,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static net.liopyu.realism.Realism.FORCE_DEFAULT_INDENT_INDEX;
+
 @EventBusSubscriber
 public class ServerEvents {
     @SubscribeEvent
     public static void onBlockRightClick(PlayerInteractEvent.RightClickBlock event) {
-        Level level = event.getLevel();
+       /* Level level = event.getLevel();
         BlockPos pos = event.getPos();
         if (level.isClientSide) return;
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
@@ -63,7 +67,7 @@ public class ServerEvents {
                 block.cycleFacing(level, pos);
 
             }
-        }
+        }*/
     }
 
 
@@ -84,7 +88,7 @@ public class ServerEvents {
     }
 
     public static Direction getPlayerLookingFace(Player player, BlockPos pos) {
-        double reach = player.isCreative() ? 5.0D : 4.5D; // Or use whatever reach you want
+        double reach = player.isCreative() ? 5.0D : 4.5D;
         Vec3 eyePos = player.getEyePosition(1.0F);
         Vec3 lookVec = player.getLookAngle();
         Vec3 target = eyePos.add(lookVec.x * reach, lookVec.y * reach, lookVec.z * reach);
@@ -107,10 +111,6 @@ public class ServerEvents {
         return Direction.getNearest(dx, dy, dz, Direction.NORTH);
     }
 
-    public static void logBlockBreakFace(Player player, BlockPos pos) {
-        Direction face = getPlayerLookingFace(player, pos);
-        LogUtils.getLogger().info("Block at {} broken on face: {}", pos, face);
-    }
 
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
@@ -121,7 +121,6 @@ public class ServerEvents {
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
         if (id == null) return;
         String key = id.toString();
-        LogUtils.getLogger().info("Breaking block: {} at {} on face {}", key, event.getPos(), minedFace);
 
         Map<String, String[]> CHAINS = Map.of(
                 "minecraft:stone", new String[]{"realism:cracked_stone", "realism:broken_stone", "realism:crumbling_stone"},
@@ -129,10 +128,13 @@ public class ServerEvents {
                 "realism:boulder_stone", new String[]{"realism:cracked_boulder_stone", "realism:broken_boulder_stone", "realism:crumbling_boulder_stone"},
                 "realism:deep_stone", new String[]{"realism:cracked_deep_stone", "realism:broken_deep_stone", "realism:crumbling_deep_stone"}
         );
+        //wooden pickaxe - 4 speed
+        //stone pickaxe - 6 speed
+        //iron pickaxe - 8 speed
         Map<String, float[]> SPEED_THRESHOLDS = Map.of(
-                "minecraft:stone", new float[]{30f, 50f, 60f},
-                "realism:stone", new float[]{30f, 50f, 60f},
-                "realism:boulder_stone", new float[]{50f, 50f, 60f},
+                "minecraft:stone", new float[]{3f, 5f, 6f},
+                "realism:stone", new float[]{3f, 5f, 6f},
+                "realism:boulder_stone", new float[]{6f, 7f, 8f},
                 "realism:deep_stone", new float[]{80f, 80f, 90f}
         );
 
@@ -150,18 +152,19 @@ public class ServerEvents {
                 if (nextBlock instanceof BaseFallingBlock baseFallingBlock) {
                     Set<Direction> indentFaces = new HashSet<>();
                     indentFaces.add(Direction.NORTH);
-                    int nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                    int nextIndentIndex;
+                    if (!FORCE_DEFAULT_INDENT_INDEX) {
+                        nextIndentIndex = 16;
+                    } else {
+                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                    }
+
                     Direction newDirection = minedFace;
                     baseFallingBlock.setParentDirection(newDirection);
-                    LogUtils.getLogger().info("[Initial] Indent faces before normalization: {} facing: {}", indentFaces, newDirection);
-                    LogUtils.getLogger().info("[Initial] Got INDENT_INDEX: {} for faces: {} facing: {}", nextIndentIndex, indentFaces, newDirection);
-                    LogUtils.getLogger().info("[Initial] Setting FACING to {} INDENT_INDEX to {}", newDirection, nextIndentIndex);
-
                     event.getLevel().setBlock(event.getPos(),
                             nextBlock.defaultBlockState()
                                     .setValue(BaseFallingBlock.FACING, newDirection)
                                     .setValue(BaseFallingBlock.INDENT_INDEX, nextIndentIndex), 3);
-                    LogUtils.getLogger().info("[Initial] Set block {} at {} FACING {} INDENT_INDEX {}", nextBlock, event.getPos(), newDirection, nextIndentIndex);
                     event.setCanceled(true);
                 }
                 return;
@@ -192,20 +195,19 @@ public class ServerEvents {
                         Set<Direction> indentFaces = new HashSet<>(prevFaces);
                         indentFaces.add(modelRelative);
 
-                        LogUtils.getLogger().info("[Chain] Previous faces: {} parentDir: {} minedFace: {} modelRelative: {} allFaces: {}",
-                                prevFaces, parentDir, minedFace, modelRelative, indentFaces);
 
-                        int nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
-
+                        int nextIndentIndex;
+                        if (!FORCE_DEFAULT_INDENT_INDEX) {
+                            nextIndentIndex = 16;
+                        } else {
+                            nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                        }
                         baseFallingBlock.setParentDirection(parentDir);
-                        LogUtils.getLogger().info("[Chain] Got INDENT_INDEX: {} for faces: {} parentDir: {}", nextIndentIndex, indentFaces, parentDir);
-                        LogUtils.getLogger().info("[Chain] Setting FACING {} INDENT_INDEX {}", parentDir, nextIndentIndex);
 
                         event.getLevel().setBlock(event.getPos(),
                                 nextBlock.defaultBlockState()
                                         .setValue(BaseFallingBlock.FACING, parentDir)
                                         .setValue(BaseFallingBlock.INDENT_INDEX, nextIndentIndex), 3);
-                        LogUtils.getLogger().info("[Chain] Set block {} at {} FACING {} INDENT_INDEX {}", nextBlock, event.getPos(), parentDir, nextIndentIndex);
                         event.setCanceled(true);
                     }
                     return;

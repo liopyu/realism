@@ -1,6 +1,7 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "realism:block/crumbling_boulder_stone"
+    "all": "realism:block/particle/crumbling_boulder_stone",
+    "particle": "realism:block/particle/crumbling_boulder_stone"
   }
 }

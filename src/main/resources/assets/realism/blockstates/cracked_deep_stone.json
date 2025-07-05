@@ -96,5 +96,11 @@
     "indent_index=15,facing=east": { "model": "realism:block/variant/deep/cracked/deep_cracked_indent_0_4_5", "y": 90 },
     "indent_index=15,facing=up": { "model": "realism:block/variant/deep/cracked/deep_cracked_indent_0_4_5", "x": 270 },
     "indent_index=15,facing=down": { "model": "realism:block/variant/deep/cracked/deep_cracked_indent_0_4_5", "x": 90 }
+,    "indent_index=16,facing=north": { "model": "realism:block/cracked_deep_stone" },
+    "indent_index=16,facing=south": { "model": "realism:block/cracked_deep_stone", "y": 180 },
+    "indent_index=16,facing=west": { "model": "realism:block/cracked_deep_stone", "y": 270 },
+    "indent_index=16,facing=east": { "model": "realism:block/cracked_deep_stone", "y": 90 },
+    "indent_index=16,facing=up": { "model": "realism:block/cracked_deep_stone", "x": 270 },
+    "indent_index=16,facing=down": { "model": "realism:block/cracked_deep_stone", "x": 90 }
   }
 }
