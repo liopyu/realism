@@ -34,7 +34,7 @@ public class BaseFallingBlock extends Block implements Fallable {
     public Block cobbledSlab;
     public final boolean isCobbled;
     public String registryName;
-    public static final IntegerProperty INDENT_INDEX = IntegerProperty.create("indent_index", 0, 16);
+    public static final IntegerProperty INDENT_INDEX = IntegerProperty.create("indent_index", 0, 32);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public Direction parentDirection;
 

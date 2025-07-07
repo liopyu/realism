@@ -247,6 +247,7 @@ public class JsonFileGenerator {
             generateItemModelJsonToPath(name, "realism:item/" + name);
         });
         BASEBLOCKS.forEach(name -> {
+            generateBreakModelVariants(name);
             generateIndentModelVariants(name);
             generateBlockJson(name);
             if (name.contains("ore")) {
@@ -733,11 +734,50 @@ public class JsonFileGenerator {
         if (name.contains("crumbling")) damage = "crumbling";
 
         String texture = "realism:block/" + name;
-        String path = ASSETS_PATH + "models/block/variant/" + subfolder + damage + "/";
+        String path = ASSETS_PATH + "models/block/variant/indent/" + subfolder + damage + "/";
 
         for (String indent : INDENT_MODELS) {
             String modelName = prefix + damage + "_indent_" + indent;
-            String parentName = "realism:block/variant/" + damage + "/" + damage + "_indent_" + indent;
+            String parentName = "realism:block/variant/indent/" + damage + "/" + damage + "_indent_" + indent;
+
+            String particleTexture = texture.replace("block/", "block/particle/");
+            String content =
+                    "{\n" +
+                            "  \"parent\": \"" + parentName + "\",\n" +
+                            "  \"textures\": {\n" +
+                            "    \"0\": \"" + texture + "\",\n" +
+                            "    \"particle\": \"" + particleTexture + "\"\n" +
+                            "  }\n" +
+                            "}";
+            writeFile(path, modelName + ".json", content);
+        }
+    }
+
+    private static void generateBreakModelVariants(String name) {
+        String prefix, subfolder;
+        if (name.contains("deep_")) {
+            prefix = "deep_";
+            subfolder = "deep/";
+        } else if (name.contains("boulder_")) {
+            prefix = "boulder_";
+            subfolder = "boulder/";
+        } else {
+            prefix = "stone_";
+            subfolder = "stone/";
+        }
+
+        if (!(name.contains("cracked") || name.contains("broken") || name.contains("crumbling"))) return;
+
+        String damage = "cracked";
+        if (name.contains("broken")) damage = "broken";
+        if (name.contains("crumbling")) damage = "crumbling";
+
+        String texture = "realism:block/" + name;
+        String path = ASSETS_PATH + "models/block/variant/break/" + subfolder + damage + "/";
+
+        for (String indent : INDENT_MODELS) {
+            String modelName = prefix + damage + "_break_" + indent;
+            String parentName = "realism:block/variant/break/" + damage + "/" + damage + "_indent_" + indent;
 
             String particleTexture = texture.replace("block/", "block/particle/");
             String content =
@@ -785,7 +825,7 @@ public class JsonFileGenerator {
                 for (int f = 0; f < facings.length; f++) {
                     variants.append("    \"indent_index=").append(i)
                             .append(",facing=").append(facings[f])
-                            .append("\": { \"model\": \"realism:block/variant/")
+                            .append("\": { \"model\": \"realism:block/variant/indent/")
                             .append(subfolder).append(damage).append("/")
                             .append(prefix).append(damage).append("_indent_").append(models[i]).append("\"");
 
@@ -804,8 +844,32 @@ public class JsonFileGenerator {
                 }
             }
             variants.append(",");
+            for (int i = 0; i < INDENT_MODELS.length; i++) {
+                for (int f = 0; f < facings.length; f++) {
+                    int breakIndex = i + 16;
+                    variants.append("    \"indent_index=").append(breakIndex)
+                            .append(",facing=").append(facings[f])
+                            .append("\": { \"model\": \"realism:block/variant/break/")
+                            .append(subfolder).append(damage).append("/")
+                            .append(prefix).append(damage).append("_break_").append(models[i]).append("\"");
+
+                    if (!facings[f].equals("north")) {
+                        if (facings[f].equals("up") || facings[f].equals("down")) {
+                            variants.append(", \"x\": ").append(xRot[f]);
+                        } else {
+                            variants.append(", \"y\": ").append(yRot[f]);
+                        }
+                    }
+                    variants.append(" }");
+                    if (!(i == INDENT_MODELS.length - 1 && f == facings.length - 1)) {
+                        variants.append(",");
+                    }
+                    variants.append("\n");
+                }
+            }
+            variants.append(",");
             for (int f = 0; f < facings.length; f++) {
-                variants.append("    \"indent_index=16,facing=").append(facings[f])
+                variants.append("    \"indent_index=32,facing=").append(facings[f])
                         .append("\": { \"model\": \"realism:block/").append(name).append("\"");
                 if (!facings[f].equals("north")) {
                     if (facings[f].equals("up") || facings[f].equals("down")) {
@@ -857,7 +921,6 @@ public class JsonFileGenerator {
                 break;
             }
         }
-
         if (isDamaged) {
             content = "{\n" +
                     "  \"parent\": \"block/" + parent + "\",\n" +

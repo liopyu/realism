@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.events.server.ServerEvents;
+import net.liopyu.realism.util.BreakMode;
 import net.liopyu.realism.util.RealismReloadListener;
 import net.liopyu.realism.util.RegistryUtils;
 import net.minecraft.core.registries.Registries;
@@ -40,7 +41,7 @@ public class Realism {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, MODID);
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static boolean FORCE_DEFAULT_INDENT_INDEX = false;
+    public static BreakMode indentIndexMode = BreakMode.DEFAULT;
 
     public static final File CONFIG_FILE = new File("config/realism.json");
 
@@ -51,7 +52,7 @@ public class Realism {
             try {
                 CONFIG_FILE.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-                    writer.write("{\n  \"custom_models\": true\n}\n");
+                    writer.write("{\n  \"break_model_mode\": \"default\"\n}\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -60,8 +61,8 @@ public class Realism {
 
         try (FileReader reader = new FileReader(CONFIG_FILE)) {
             JsonObject obj = gson.fromJson(reader, JsonObject.class);
-            if (obj.has("custom_models")) {
-                FORCE_DEFAULT_INDENT_INDEX = obj.get("custom_models").getAsBoolean();
+            if (obj.has("break_model_mode")) {
+                indentIndexMode = BreakMode.valueOf(obj.get("break_model_mode").getAsString().toUpperCase());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,7 +122,7 @@ public class Realism {
             try {
                 configFile.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(configFile)) {
-                    writer.write("{\n  \"custom_models\": true\n}\n");
+                    writer.write("{\n  \"break_model_mode\": \"default\"\n}\n");
                 }
                 System.out.println("Generated default realism.json config at: " + configFile.getAbsolutePath());
             } catch (IOException e) {

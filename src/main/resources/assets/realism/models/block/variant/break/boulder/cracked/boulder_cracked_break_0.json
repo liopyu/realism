@@ -1,0 +1,7 @@
+{
+  "parent": "realism:block/variant/break/cracked/cracked_indent_0",
+  "textures": {
+    "0": "realism:block/cracked_boulder_stone",
+    "particle": "realism:block/particle/cracked_boulder_stone"
+  }
+}

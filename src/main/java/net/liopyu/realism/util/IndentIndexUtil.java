@@ -32,11 +32,18 @@ public class IndentIndexUtil {
     );
 
     public static int getIndentIndex(Set<Direction> faces, Direction facing) {
+        LogUtils.getLogger().info("[IndentIndexUtil] getIndentIndex input faces: {}, facing: {}", faces, facing);
+
         Set<Direction> normalized = new HashSet<>();
         for (Direction d : faces) {
-            normalized.add(relativeToNorth(d, facing));
+            Direction rel = relativeToNorth(d, facing);
+            LogUtils.getLogger().info("[IndentIndexUtil]   face: {} -> rel: {}", d, rel);
+            normalized.add(rel);
         }
+
+        LogUtils.getLogger().info("[IndentIndexUtil] normalized set: {}", normalized);
         Integer idx = INDENT_INDEX_MAP.get(normalized);
+        LogUtils.getLogger().info("[IndentIndexUtil] indent index result: {}", idx);
         return idx != null ? idx : 0;
     }
 

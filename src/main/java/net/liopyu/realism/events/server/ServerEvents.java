@@ -2,6 +2,7 @@ package net.liopyu.realism.events.server;
 
 import com.mojang.logging.LogUtils;
 import net.liopyu.realism.block.BaseFallingBlock;
+import net.liopyu.realism.util.BreakMode;
 import net.liopyu.realism.util.IndentIndexUtil;
 import net.liopyu.realism.util.RealismReloadListener;
 import net.minecraft.core.BlockPos;
@@ -33,12 +34,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static net.liopyu.realism.Realism.FORCE_DEFAULT_INDENT_INDEX;
+import static net.liopyu.realism.Realism.indentIndexMode;
 
 @EventBusSubscriber
 public class ServerEvents {
@@ -138,6 +136,9 @@ public class ServerEvents {
                 "realism:deep_stone", new float[]{80f, 80f, 90f}
         );
 
+        LogUtils.getLogger().info("[BreakEvent] Player: {}, Block: {}, State: {}", event.getPlayer().getName().getString(), key, state);
+        LogUtils.getLogger().info("[BreakEvent] Current INDENT_INDEX: {}", state.hasProperty(BaseFallingBlock.INDENT_INDEX) ? state.getValue(BaseFallingBlock.INDENT_INDEX) : -1);
+
         if (CHAINS.containsKey(key)) {
             float speed = event.getPlayer().getMainHandItem().getDestroySpeed(state);
             float[] thresholds = SPEED_THRESHOLDS.getOrDefault(key, new float[]{});
@@ -146,24 +147,31 @@ public class ServerEvents {
             while (stage < thresholds.length && speed >= thresholds[stage]) {
                 stage++;
             }
+            LogUtils.getLogger().info("[BreakEvent] Speed: {}, Thresholds: {}, Stage: {}", speed, Arrays.toString(thresholds), stage);
+
             if (stage < chain.length) {
-                Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(chain[stage])).isPresent()
-                        ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(chain[stage])).get().value() : null;
+                String nextName = chain[stage];
+                Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(nextName)).isPresent()
+                        ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(nextName)).get().value() : null;
                 if (nextBlock instanceof BaseFallingBlock baseFallingBlock) {
                     Set<Direction> indentFaces = new HashSet<>();
                     indentFaces.add(Direction.NORTH);
-                    int nextIndentIndex;
-                    if (!FORCE_DEFAULT_INDENT_INDEX) {
-                        nextIndentIndex = 16;
-                    } else {
-                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
-                    }
+                    LogUtils.getLogger().info("[BreakEvent] indentFaces: {}, minedFace: {}", indentFaces, minedFace);
 
-                    Direction newDirection = minedFace;
-                    baseFallingBlock.setParentDirection(newDirection);
+                    int nextIndentIndex = 0;
+                    if (indentIndexMode == BreakMode.DEFAULT) {
+                        nextIndentIndex = 32;
+                    } else if (indentIndexMode == BreakMode.INDENT) {
+                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                    } else if (indentIndexMode == BreakMode.BREAK) {
+                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
+                    }
+                    LogUtils.getLogger().info("[BreakEvent] (CHAIN) Next block: {}, FACING: {}, INDENT_INDEX: {}", nextName, minedFace, nextIndentIndex);
+
+                    baseFallingBlock.setParentDirection(minedFace);
                     event.getLevel().setBlock(event.getPos(),
                             nextBlock.defaultBlockState()
-                                    .setValue(BaseFallingBlock.FACING, newDirection)
+                                    .setValue(BaseFallingBlock.FACING, minedFace)
                                     .setValue(BaseFallingBlock.INDENT_INDEX, nextIndentIndex), 3);
                     event.setCanceled(true);
                 }
@@ -185,25 +193,36 @@ public class ServerEvents {
                         int prevIndentIndex = state.hasProperty(BaseFallingBlock.INDENT_INDEX)
                                 ? state.getValue(BaseFallingBlock.INDENT_INDEX)
                                 : 0;
+
+                        int baseIndentIndex = prevIndentIndex % 16;
+
                         Set<Direction> prevFaces = IndentIndexUtil.INDENT_INDEX_MAP.entrySet().stream()
-                                .filter(e2 -> e2.getValue() == prevIndentIndex)
+                                .filter(e2 -> e2.getValue() == baseIndentIndex)
                                 .map(Map.Entry::getKey)
                                 .findFirst()
                                 .orElse(Set.of(Direction.NORTH));
+
 
                         Direction modelRelative = IndentIndexUtil.worldToModelRelative(minedFace, parentDir);
                         Set<Direction> indentFaces = new HashSet<>(prevFaces);
                         indentFaces.add(modelRelative);
 
+                        LogUtils.getLogger().info("[BreakEvent] chain[i]: {} -> next: {}", chain[i], next);
+                        LogUtils.getLogger().info("[BreakEvent] parentDir: {}, prevIndentIndex: {}, prevFaces: {}", parentDir, prevIndentIndex, prevFaces);
+                        LogUtils.getLogger().info("[BreakEvent] minedFace: {}, modelRelative: {}", minedFace, modelRelative);
+                        LogUtils.getLogger().info("[BreakEvent] indentFaces after add: {}", indentFaces);
 
-                        int nextIndentIndex;
-                        if (!FORCE_DEFAULT_INDENT_INDEX) {
-                            nextIndentIndex = 16;
-                        } else {
+                        int nextIndentIndex = 0;
+                        if (indentIndexMode == BreakMode.DEFAULT) {
+                            nextIndentIndex = 32;
+                        } else if (indentIndexMode == BreakMode.INDENT) {
                             nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                        } else if (indentIndexMode == BreakMode.BREAK) {
+                            nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
                         }
-                        baseFallingBlock.setParentDirection(parentDir);
+                        LogUtils.getLogger().info("[BreakEvent] (CHAIN LOOP) Next block: {}, parentDir: {}, nextIndentIndex: {}", next, parentDir, nextIndentIndex);
 
+                        baseFallingBlock.setParentDirection(parentDir);
                         event.getLevel().setBlock(event.getPos(),
                                 nextBlock.defaultBlockState()
                                         .setValue(BaseFallingBlock.FACING, parentDir)
