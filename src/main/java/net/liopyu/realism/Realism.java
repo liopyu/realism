@@ -52,7 +52,7 @@ public class Realism {
             try {
                 CONFIG_FILE.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-                    writer.write("{\n  \"break_model_mode\": \"default\"\n}\n");
+                    writer.write("{\n  \"__comment\": \"Reloadable options for block modelling: 'default', 'break', 'indent'\",\n  \"break_model_mode\": \"default\"\n}\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -122,9 +122,9 @@ public class Realism {
             try {
                 configFile.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(configFile)) {
-                    writer.write("{\n  \"break_model_mode\": \"default\"\n}\n");
+                    writer.write("{\n  \"__comment\": \"Reloadable options for block modelling: 'default', 'break', 'indent'\",\n  \"break_model_mode\": \"default\"\n}\n");
+
                 }
-                System.out.println("Generated default realism.json config at: " + configFile.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             }

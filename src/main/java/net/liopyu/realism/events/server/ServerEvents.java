@@ -130,9 +130,9 @@ public class ServerEvents {
         //stone pickaxe - 6 speed
         //iron pickaxe - 8 speed
         Map<String, float[]> SPEED_THRESHOLDS = Map.of(
-                "minecraft:stone", new float[]{3f, 5f, 6f},
-                "realism:stone", new float[]{3f, 5f, 6f},
-                "realism:boulder_stone", new float[]{6f, 7f, 8f},
+                "minecraft:stone", new float[]{30f, 50f, 60f},
+                "realism:stone", new float[]{30f, 50f, 60f},
+                "realism:boulder_stone", new float[]{60f, 70f, 80f},
                 "realism:deep_stone", new float[]{80f, 80f, 90f}
         );
 
