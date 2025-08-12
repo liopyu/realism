@@ -6,6 +6,7 @@ import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.block.BaseFallingSlab;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,7 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.entity.schedule.Schedule;
 import net.minecraft.world.inventory.MenuType;
@@ -32,6 +34,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
@@ -46,6 +49,9 @@ import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerTy
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
@@ -311,5 +317,29 @@ public class RealismHelperClass {
                 self.discard();
             }
         }
+    }
+
+    public static Direction getPlayerLookingFace(Player player, BlockPos pos) {
+        double reach = player.isCreative() ? 5.0D : 4.5D;
+        Vec3 eyePos = player.getEyePosition(1.0F);
+        Vec3 lookVec = player.getLookAngle();
+        Vec3 target = eyePos.add(lookVec.x * reach, lookVec.y * reach, lookVec.z * reach);
+
+        Level level = player.level();
+        BlockHitResult result = level.clip(new net.minecraft.world.level.ClipContext(
+                eyePos, target,
+                net.minecraft.world.level.ClipContext.Block.OUTLINE,
+                net.minecraft.world.level.ClipContext.Fluid.NONE,
+                player
+        ));
+
+        if (result.getType() == HitResult.Type.BLOCK && result.getBlockPos().equals(pos)) {
+            return result.getDirection();
+        }
+        Vec3 center = Vec3.atCenterOf(pos);
+        int dx = (int) Math.round(eyePos.x - center.x);
+        int dy = (int) Math.round(eyePos.y - center.y);
+        int dz = (int) Math.round(eyePos.z - center.z);
+        return Direction.getNearest(dx, dy, dz, Direction.NORTH);
     }
 }

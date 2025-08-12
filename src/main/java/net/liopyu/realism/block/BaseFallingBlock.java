@@ -2,7 +2,9 @@ package net.liopyu.realism.block;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import net.liopyu.realism.util.BreakMode;
 import net.liopyu.realism.util.FallingBlockAccess;
+import net.liopyu.realism.util.IndentIndexUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -11,11 +13,16 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -29,6 +36,18 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+
+import static net.liopyu.realism.Realism.indentIndexMode;
+import static net.liopyu.realism.util.RealismHelperClass.getPlayerLookingFace;
 
 public class BaseFallingBlock extends Block implements Fallable {
     public Block cobbledSlab;
@@ -37,6 +56,7 @@ public class BaseFallingBlock extends Block implements Fallable {
     public static final IntegerProperty INDENT_INDEX = IntegerProperty.create("indent_index", 0, 32);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public Direction parentDirection;
+    public static final IntegerProperty MINE_STAGE = IntegerProperty.create("mine_stage", 0, 3);
 
     public BaseFallingBlock(BlockBehaviour.Properties properties, boolean isCobbled) {
         super(properties);
@@ -45,6 +65,7 @@ public class BaseFallingBlock extends Block implements Fallable {
                 .setValue(PLACED, false)
                 .setValue(FACING, Direction.NORTH)
                 .setValue(INDENT_INDEX, 0)
+                .setValue(MINE_STAGE, 0)
         );
 
     }
@@ -76,15 +97,156 @@ public class BaseFallingBlock extends Block implements Fallable {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(PLACED, INDENT_INDEX, FACING);
+        builder.add(PLACED, INDENT_INDEX, FACING, MINE_STAGE);
     }
+
+    @Override
+    protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack stack, boolean dropExperience) {
+        super.spawnAfterBreak(state, level, pos, stack, dropExperience);
+    }
+
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level lvl, BlockPos pos, Player player, boolean willHarvest, net.minecraft.world.level.material.FluidState fluid) {
+        //if (true) return;
+        if (player.isCreative()) return super.onDestroyedByPlayer(state, lvl, pos, player, willHarvest, fluid);
+        Direction minedFace = getPlayerLookingFace(player, pos);
+        Block block = state.getBlock();
+        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
+        if (id == null) return super.onDestroyedByPlayer(state, lvl, pos, player, willHarvest, fluid);
+        String key = id.toString();
+        Map<String, String[]> CHAINS = Map.of(
+                "minecraft:stone", new String[]{"realism:cracked_stone", "realism:broken_stone", "realism:crumbling_stone"},
+                "realism:stone", new String[]{"realism:cracked_stone", "realism:broken_stone", "realism:crumbling_stone"},
+                "realism:boulder_stone", new String[]{"realism:cracked_boulder_stone", "realism:broken_boulder_stone", "realism:crumbling_boulder_stone"},
+                "realism:deep_stone", new String[]{"realism:cracked_deep_stone", "realism:broken_deep_stone", "realism:crumbling_deep_stone"}
+        );
+        //wooden pickaxe - 4 speed
+        //stone pickaxe - 6 speed
+        //iron pickaxe - 8 speed
+        Map<String, float[]> SPEED_THRESHOLDS = Map.of(
+                "minecraft:stone", new float[]{3f, 5f, 6f},
+                "realism:stone", new float[]{3f, 5f, 6f},
+                "realism:boulder_stone", new float[]{6f, 7f, 8f},
+                "realism:deep_stone", new float[]{8f, 8f, 9f}
+        );
+        var list = List.of("minecraft:stone",
+                "realism:stone",
+                "realism:boulder_stone",
+                "realism:deep_stone");
+
+        if ((lvl instanceof Level level && !level.isClientSide) &&
+                (list.contains(key) || key.contains("cracked") || key.contains("broken") || key.contains("crumbling"))) {
+            float fallPitch = 1.5f + (level.getRandom().nextFloat() - 0.5f) * 0.4f;
+            float landPitch = 0.8f + (level.getRandom().nextFloat() - 0.5f) * 0.4f;
+            level.playSound(
+                    null,
+                    pos,
+                    SoundEvents.ANVIL_FALL,
+                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    0.3f,
+                    fallPitch
+            );
+        }
+        if (CHAINS.containsKey(key)) {
+
+            float speed = player.getMainHandItem().getDestroySpeed(state);
+            float[] thresholds = SPEED_THRESHOLDS.getOrDefault(key, new float[]{});
+            String[] chain = CHAINS.get(key);
+            int stage = 0;
+            while (stage < thresholds.length && speed >= thresholds[stage]) {
+                stage++;
+            }
+
+            if (stage < chain.length) {
+                String nextName = chain[stage];
+                Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(nextName)).isPresent()
+                        ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(nextName)).get().value() : null;
+                if (nextBlock instanceof BaseFallingBlock baseFallingBlock) {
+                    Set<Direction> indentFaces = new HashSet<>();
+                    indentFaces.add(Direction.NORTH);
+
+                    int nextIndentIndex = 0;
+                    if (indentIndexMode == BreakMode.DEFAULT) {
+                        nextIndentIndex = 32;
+                    } else if (indentIndexMode == BreakMode.INDENT) {
+                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                    } else if (indentIndexMode == BreakMode.BREAK) {
+                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
+                    }
+
+                    baseFallingBlock.setParentDirection(minedFace);
+                    lvl.setBlock(pos,
+                            nextBlock.defaultBlockState()
+                                    .setValue(BaseFallingBlock.FACING, minedFace)
+                                    .setValue(BaseFallingBlock.INDENT_INDEX, nextIndentIndex), 3);
+
+
+                    return false;
+                }
+                return super.onDestroyedByPlayer(state, lvl, pos, player, willHarvest, fluid);
+            }
+        }
+
+        for (var e : CHAINS.entrySet()) {
+            String[] chain = e.getValue();
+            for (int i = 0; i < chain.length - 1; i++) {
+                if (chain[i].equals(key)) {
+                    String next = chain[i + 1];
+                    Block nextBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(next)).isPresent()
+                            ? BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(next)).get().value() : null;
+                    if (nextBlock instanceof BaseFallingBlock baseFallingBlock) {
+                        Direction parentDir = state.hasProperty(BaseFallingBlock.FACING)
+                                ? state.getValue(BaseFallingBlock.FACING)
+                                : Direction.NORTH;
+                        int prevIndentIndex = state.hasProperty(BaseFallingBlock.INDENT_INDEX)
+                                ? state.getValue(BaseFallingBlock.INDENT_INDEX)
+                                : 0;
+
+                        int baseIndentIndex = prevIndentIndex % 16;
+
+                        Set<Direction> prevFaces = IndentIndexUtil.INDENT_INDEX_MAP.entrySet().stream()
+                                .filter(e2 -> e2.getValue() == baseIndentIndex)
+                                .map(Map.Entry::getKey)
+                                .findFirst()
+                                .orElse(Set.of(Direction.NORTH));
+
+
+                        Direction modelRelative = IndentIndexUtil.worldToModelRelative(minedFace, parentDir);
+                        Set<Direction> indentFaces = new HashSet<>(prevFaces);
+                        indentFaces.add(modelRelative);
+
+                        int nextIndentIndex = 0;
+                        if (indentIndexMode == BreakMode.DEFAULT) {
+                            nextIndentIndex = 32;
+                        } else if (indentIndexMode == BreakMode.INDENT) {
+                            nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
+                        } else if (indentIndexMode == BreakMode.BREAK) {
+                            nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
+                        }
+
+                        baseFallingBlock.setParentDirection(parentDir);
+                        lvl.setBlock(pos,
+                                nextBlock.defaultBlockState()
+                                        .setValue(BaseFallingBlock.FACING, parentDir)
+                                        .setValue(BaseFallingBlock.INDENT_INDEX, nextIndentIndex), 3);
+
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
+        return super.onDestroyedByPlayer(state, lvl, pos, player, willHarvest, fluid);
+    }
+
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return super.getStateForPlacement(context)
                 .setValue(PLACED, true)
                 .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(INDENT_INDEX, 0);
+                .setValue(INDENT_INDEX, 0)
+                .setValue(MINE_STAGE, 0);
     }
 
     public void setFacing(Level level, BlockPos pos, Direction facing) {
@@ -225,6 +387,12 @@ public class BaseFallingBlock extends Block implements Fallable {
         } else {
             level.setBlockAndUpdate(pos, fallingState);
         }
+    }
+
+
+    @Override
+    public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, @Nullable Entity entity) {
+        return super.getSoundType(state, level, pos, entity);
     }
 
     @Override

@@ -77,7 +77,6 @@ public class Realism {
                             .setId(ResourceKey.create(Registries.BLOCK, rl))
                             .mapColor(MapColor.STONE)
                             .instrument(NoteBlockInstrument.BASEDRUM)
-
                             .strength(strength, resistance);
                     if (noOcclusion) {
                         props = props.noOcclusion();
