@@ -884,7 +884,23 @@ public class JsonFileGenerator {
                 }
                 variants.append("\n");
             }
-
+            variants.append(",");
+            for (int f = 0; f < facings.length; f++) {
+                variants.append("    \"indent_index=33,facing=").append(facings[f])
+                        .append("\": { \"model\": \"realism:block/variant/break/")
+                        .append(subfolder).append(damage).append("/")
+                        .append(prefix).append(damage).append("_break_all\"");
+                if (!facings[f].equals("north")) {
+                    if (facings[f].equals("up") || facings[f].equals("down")) {
+                        variants.append(", \"x\": ").append(xRot[f]);
+                    } else {
+                        variants.append(", \"y\": ").append(yRot[f]);
+                    }
+                }
+                variants.append(" }");
+                if (f != facings.length - 1) variants.append(",");
+                variants.append("\n");
+            }
             content = "{\n" +
                     "  \"variants\": {\n" +
                     variants +

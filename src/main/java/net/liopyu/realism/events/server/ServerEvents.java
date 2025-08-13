@@ -1,5 +1,6 @@
 package net.liopyu.realism.events.server;
 
+import net.liopyu.realism.Realism;
 import net.liopyu.realism.block.BaseFallingBlock;
 import net.liopyu.realism.util.BreakMode;
 import net.liopyu.realism.util.IndentIndexUtil;
@@ -113,9 +114,8 @@ public class ServerEvents {
                     Direction parentDir = minedFace;
                     Direction modelRel = IndentIndexUtil.worldToModelRelative(minedFace, parentDir);
                     int idx;
-                    if (indentIndexMode == BreakMode.DEFAULT) idx = 32;
-                    else if (indentIndexMode == BreakMode.INDENT)
-                        idx = IndentIndexUtil.getIndentIndex(java.util.Set.of(modelRel), Direction.NORTH);
+                    if (Realism.indentAll) idx = 33;
+                    else if (indentIndexMode == BreakMode.DEFAULT) idx = 32;
                     else idx = IndentIndexUtil.getIndentIndex(java.util.Set.of(modelRel), Direction.NORTH) + 16;
                     bfb.setParentDirection(parentDir);
                     newState = newState

@@ -44,8 +44,6 @@ public class IndentIndexUtil {
     public static int computeNextIndentIndex(Set<Direction> indentFaces, BreakMode indentIndexMode) {
         if (indentIndexMode == BreakMode.DEFAULT) {
             return 32;
-        } else if (indentIndexMode == BreakMode.INDENT) {
-            return IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
         } else if (indentIndexMode == BreakMode.BREAK) {
             return IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
         }

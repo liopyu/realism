@@ -42,28 +42,26 @@ public class Realism {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB, MODID);
     public static final Logger LOGGER = LogUtils.getLogger();
     public static BreakMode indentIndexMode = BreakMode.DEFAULT;
-
+    public static boolean indentAll = false;
     public static final File CONFIG_FILE = new File("config/realism.json");
 
     public static void loadOrCreateConfig() {
         Gson gson = new Gson();
-
         if (!CONFIG_FILE.exists()) {
             try {
                 CONFIG_FILE.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-                    writer.write("{\n  \"__comment\": \"Reloadable options for block modelling: 'default', 'break', 'indent'\",\n  \"break_model_mode\": \"default\"\n}\n");
+                    writer.write("{\n  \"__comment\": \"Reloadable options for block modelling: 'default', 'break', 'indent'\",\n  \"break_model_mode\": \"default\",\n  \"indent_all\": false\n}\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
         try (FileReader reader = new FileReader(CONFIG_FILE)) {
             JsonObject obj = gson.fromJson(reader, JsonObject.class);
-            if (obj.has("break_model_mode")) {
+            if (obj.has("break_model_mode"))
                 indentIndexMode = BreakMode.valueOf(obj.get("break_model_mode").getAsString().toUpperCase());
-            }
+            if (obj.has("indent_all")) indentAll = obj.get("indent_all").getAsBoolean();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,8 +119,7 @@ public class Realism {
             try {
                 configFile.getParentFile().mkdirs();
                 try (FileWriter writer = new FileWriter(configFile)) {
-                    writer.write("{\n  \"__comment\": \"Reloadable options for block modelling: 'default', 'break', 'indent'\",\n  \"break_model_mode\": \"default\"\n}\n");
-
+                    writer.write("{\n  \"__comment\": \"Reloadable options for block modelling: 'default', 'break'\",\n  \"break_model_mode\": \"default\",\n  \"indent_all\": false\n}\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();

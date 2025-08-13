@@ -2,6 +2,7 @@ package net.liopyu.realism.block;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
+import net.liopyu.realism.Realism;
 import net.liopyu.realism.util.BreakMode;
 import net.liopyu.realism.util.FallingBlockAccess;
 import net.liopyu.realism.util.IndentIndexUtil;
@@ -53,7 +54,7 @@ public class BaseFallingBlock extends Block implements Fallable {
     public Block cobbledSlab;
     public final boolean isCobbled;
     public String registryName;
-    public static final IntegerProperty INDENT_INDEX = IntegerProperty.create("indent_index", 0, 32);
+    public static final IntegerProperty INDENT_INDEX = IntegerProperty.create("indent_index", 0, 33);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public Direction parentDirection;
     public static final IntegerProperty MINE_STAGE = IntegerProperty.create("mine_stage", 0, 3);
@@ -166,10 +167,9 @@ public class BaseFallingBlock extends Block implements Fallable {
                     indentFaces.add(Direction.NORTH);
 
                     int nextIndentIndex = 0;
-                    if (indentIndexMode == BreakMode.DEFAULT) {
+                    if (Realism.indentAll) nextIndentIndex = 33;
+                    else if (indentIndexMode == BreakMode.DEFAULT) {
                         nextIndentIndex = 32;
-                    } else if (indentIndexMode == BreakMode.INDENT) {
-                        nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
                     } else if (indentIndexMode == BreakMode.BREAK) {
                         nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
                     }
@@ -216,10 +216,9 @@ public class BaseFallingBlock extends Block implements Fallable {
                         indentFaces.add(modelRelative);
 
                         int nextIndentIndex = 0;
-                        if (indentIndexMode == BreakMode.DEFAULT) {
+                        if (Realism.indentAll) nextIndentIndex = 33;
+                        else if (indentIndexMode == BreakMode.DEFAULT) {
                             nextIndentIndex = 32;
-                        } else if (indentIndexMode == BreakMode.INDENT) {
-                            nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH);
                         } else if (indentIndexMode == BreakMode.BREAK) {
                             nextIndentIndex = IndentIndexUtil.getIndentIndex(indentFaces, Direction.NORTH) + 16;
                         }

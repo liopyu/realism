@@ -198,5 +198,11 @@
     "indent_index=32,facing=east": { "model": "realism:block/crumbling_stone", "y": 90 },
     "indent_index=32,facing=up": { "model": "realism:block/crumbling_stone", "x": 270 },
     "indent_index=32,facing=down": { "model": "realism:block/crumbling_stone", "x": 90 }
+,    "indent_index=33,facing=north": { "model": "realism:block/variant/break/stone/crumbling/stone_crumbling_break_all" },
+    "indent_index=33,facing=south": { "model": "realism:block/variant/break/stone/crumbling/stone_crumbling_break_all", "y": 180 },
+    "indent_index=33,facing=west": { "model": "realism:block/variant/break/stone/crumbling/stone_crumbling_break_all", "y": 270 },
+    "indent_index=33,facing=east": { "model": "realism:block/variant/break/stone/crumbling/stone_crumbling_break_all", "y": 90 },
+    "indent_index=33,facing=up": { "model": "realism:block/variant/break/stone/crumbling/stone_crumbling_break_all", "x": 270 },
+    "indent_index=33,facing=down": { "model": "realism:block/variant/break/stone/crumbling/stone_crumbling_break_all", "x": 90 }
   }
 }
